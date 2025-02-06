@@ -27,6 +27,7 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.util.sendable.Sendable;
 
+
 public class Wrist extends SubsystemBase {
   private final SparkMax wrist;
   private final SparkMaxConfig wristConfig;
