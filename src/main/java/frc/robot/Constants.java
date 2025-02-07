@@ -18,7 +18,10 @@ public final class Constants {
   }
 
   public static class ElevatorConstants {
-    public static final int ELEVATOR_MOTOR = 0;
+    //placeholder values, change as soon as possible
+
+    public static final int ELEVATOR_ID = 0;
     public static final int ELEVATOR_ENCODER = 0;
+    public static final int LASERCAN_ID = 0;
   }
 }
