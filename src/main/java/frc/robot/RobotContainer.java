@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -36,6 +37,7 @@ public class RobotContainer {
   private MoveElevatorToPosition moveElevatorL3;
   private MoveElevatorToPosition moveElevatorL4;
 
+  private JoystickButton elevatorToProcessor;
   private POVButton elevatorToL1;
   private POVButton elevatorToL2;
   private POVButton elevatorToL3;
@@ -59,6 +61,7 @@ public RobotContainer() {
   elevatorToL2 = new POVButton(operator, 90);
   elevatorToL3 = new POVButton(operator, 270);
   elevatorToL4 = new POVButton(operator, 0);
+  elevatorToProcessor = new JoystickButton(operator, XboxController.Button.kA.value);
 
   //operator commands
   moveElevatorL1 = new MoveElevatorToPosition(elevator, ElevatorConstants.L1_HEIGHT);
@@ -86,6 +89,7 @@ private void configureBindings() {
   elevatorToL2.onTrue(moveElevatorL2); // left button on d-pad
   elevatorToL3.onTrue(moveElevatorL3); // right button on d-pad
   elevatorToL4.onTrue(moveElevatorL4); // top button on d-pad
+  elevatorToProcessor.onTrue(moveElevatorProcessor); // the A button
 
   // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
   new Trigger(m_exampleSubsystem::exampleCondition)
