@@ -4,8 +4,8 @@
 
 package frc.robot.commands;
 
-import static frc.robot.Constants.IntakeConstants.HIGH_WRIST_POS;
-import static frc.robot.Constants.IntakeConstants.LOW_WRIST_POS;
+import static frc.robot.Constants.WristConstants.HIGH_WRIST_POS;
+import static frc.robot.Constants.WristConstants.LOW_WRIST_POS;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
@@ -14,7 +14,7 @@ import com.revrobotics.jni.CANSparkJNI;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-
+import frc.robot.Constants.WristConstants;
 import frc.robot.subsystems.Wrist;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
@@ -22,8 +22,17 @@ public class WristToPosition extends Command {
   private Wrist wrist;
   private XboxController joystick;
   private PIDController pidController;
+  private boolean goingDown;
+
+  private double position;
   /** Creates a new WristToPosition. */
-  public WristToPosition() {
+  public WristToPosition(Wrist wrist, double position) {
+    this.wrist = wrist;
+    goingDown = false;
+    this.position = position;
+
+    pidController = new PIDController(WristConstants.WRIST_P, WristConstants.WRIST_I, WristConstants.WRIST_D);
+    addRequirements(wrist );
     // Use addRequirements() here to declare subsystem dependencies.
   }
 

@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.revrobotics.spark.*;
 import com.revrobotics.config.*;
 
-import static frc.robot.Constants.IntakeConstants.*;
+import static frc.robot.Constants.WristConstants.*;
 
 import java.io.ObjectInputFilter.Config;
 

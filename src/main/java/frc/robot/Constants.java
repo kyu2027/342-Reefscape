@@ -16,29 +16,26 @@ public final class Constants {
   /*
    * Constants are tbd
    */
-  public static class IntakeConstants {
+  public static class WristConstants {
     public static final int INTAKE_SENSOR = 1;
-    
-    public static final int INTAKE_MOTOR = 10;
   
     public static final int WRIST_ID = 9;
-    public static final int LEFT_ELEV_ID = 13;
-    public static final int RIGHT_ElEV_ID = 14;
   
     public static final int MAG_ENCODER = 7;
   
-    public static final double INTAKE_SPEED = 0.6;
-    public static final double INTAKE_SHOOT_SPEED = 1;
-    public static final double FEED_SHOOTER_SPEED = 1; 
     public static final double WRIST_SPEED = 0.7;
+
+    //Wrist PID values
+    public static final double WRIST_P = 1;
+    public static final double WRIST_I = 0;
+    public static final double WRIST_D = 0.01;
   
-  public static final double LOW_WRIST_POS = 0.9;
+    //Wrist position Values (absolute enocder values I think)
+    public static final double LOW_WRIST_POS = 0.9;
     public static final double HIGH_WRIST_POS = 0.30;
     public static final double AMP_POS = 0.531; // In memoriam of 0.342 :(
   
     public static final double MAX_DISTANCE = 83;
-    
-    public static final double DESIRED_SPEED = 5100;
     
     public static final double DEFAULT_CURRENT = 30;
   }
