@@ -48,7 +48,7 @@ public class Elevator extends SubsystemBase {
 
     elevatorMotorConfig
       .idleMode(IdleMode.kBrake)
-      .secondaryCurrentLimit(30); //Couldn't find setSmartCurrentLimit import, so used secondaryCurrentLimit instead
+      .smartCurrentLimit(30);
 
     elevatorMotor.configure(elevatorMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
