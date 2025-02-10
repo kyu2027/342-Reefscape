@@ -10,6 +10,7 @@ import frc.robot.commands.ExampleCommand;
 import frc.robot.subsystems.ExampleSubsystem;
 
 import frc.robot.commands.MoveElevatorToPosition;
+import frc.robot.commands.MoveElevatorWithJoystick;
 import frc.robot.subsystems.Elevator;
 import frc.robot.Constants.ElevatorConstants;
 
@@ -36,6 +37,7 @@ public class RobotContainer {
   private MoveElevatorToPosition moveElevatorL2;
   private MoveElevatorToPosition moveElevatorL3;
   private MoveElevatorToPosition moveElevatorL4;
+  private MoveElevatorWithJoystick moveElevatorWithJoystick;
 
   private JoystickButton elevatorToProcessor;
   private POVButton elevatorToL1;
@@ -70,7 +72,7 @@ public RobotContainer() {
   moveElevatorL4 = new MoveElevatorToPosition(elevator, ElevatorConstants.L4_HEIGHT);
   moveElevatorProcessor = new MoveElevatorToPosition(elevator, ElevatorConstants.PROCESSOR_HEIGHT);
 
-  // elevator.setDefaultCommand(moveElevatorTrough);
+  elevator.setDefaultCommand(moveElevatorWithJoystick);
 
   configureBindings();
 }
