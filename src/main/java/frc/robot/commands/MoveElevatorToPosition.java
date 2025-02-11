@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.XboxController;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class MoveElevatorToPosition extends Command {
+
   private PIDController elevatorPID;
 
   private Elevator elevator;
@@ -26,16 +27,17 @@ public class MoveElevatorToPosition extends Command {
     this.elevator = elevator;
     this.nextPosition = nextPosition;
 
-    //placeholder values, change after testing
+    //Placeholder values, change after testing
     elevatorPID = new PIDController(0, 0, 0);
 
-    //placeholder value, change later
+    //Placeholder value, change later
     elevatorPID.setTolerance(1);
 
     goingDown = false;
 
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(elevator);
+
   }
 
   // Called when the command is initially scheduled.
@@ -45,26 +47,28 @@ public class MoveElevatorToPosition extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+
     double currentPosition = elevator.getPosition();
 
     double speed = elevatorPID.calculate(currentPosition, nextPosition);
     
+    //If needed, change the clamp values after testing
     MathUtil.clamp(speed, -1, 1);
 
-    //if needed, change the boolean statement after getting encoder values
     goingDown = currentPosition > nextPosition;
 
     elevator.moveElevator(speed);
 
-    //if required, change the boolean statements of these two 
-    //after receiving the top and bottom positions
+    //Prevents the elevator from trying to move down while already at the min height
     if(goingDown && currentPosition < ElevatorConstants.BOTTOM_POSITION) {
       elevator.stop();
     }
 
+    //Prevents the elevator from trying to move up while already at the max height
     if(!goingDown && currentPosition > ElevatorConstants.TOP_POSITION) {
       elevator.stop();
     }
+
   }
 
   // Called once the command ends or is interrupted.

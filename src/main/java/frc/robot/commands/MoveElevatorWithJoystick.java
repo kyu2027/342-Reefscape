@@ -18,11 +18,13 @@ public class MoveElevatorWithJoystick extends Command {
   private XboxController operator;
 
   public MoveElevatorWithJoystick(Elevator elevator, XboxController operator) {
+
     this.elevator = elevator;
     this.operator = operator;
 
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(elevator);
+
   }
 
   // Called when the command is initially scheduled.
@@ -32,12 +34,14 @@ public class MoveElevatorWithJoystick extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+
     double speed = operator.getLeftY();
 
-    //change the clamp values after testing
+    //Change the clamp values after testing
     MathUtil.clamp(speed, -1, 1);
 
     elevator.moveElevator(speed);
+
   }
 
   // Called once the command ends or is interrupted.
