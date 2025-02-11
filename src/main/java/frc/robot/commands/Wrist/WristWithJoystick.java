@@ -2,37 +2,37 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands;
+package frc.robot.commands.Wrist;
+
+import frc.robot.subsystems.Wrist;
+import frc.robot.Constants.WristConstants;
+import edu.wpi.first.wpilibj2.command.Command;
 
 import static frc.robot.Constants.WristConstants.HIGH_WRIST_POS;
 import static frc.robot.Constants.WristConstants.LOW_WRIST_POS;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.wpilibj.Encoder;
-import com.revrobotics.jni.CANSparkJNI;
+import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants.WristConstants;
-import frc.robot.subsystems.Wrist;
+
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class WristToPosition extends Command {
+public class WristWithJoystick extends Command {
+
+  private XboxController joy;
   private Wrist wrist;
-  private XboxController joystick;
-  private PIDController pidController;
+
+  private double currentPosition;
+  private double speed;
+
   private boolean goingDown;
 
-  private double position;
-  /** Creates a new WristToPosition. */
-  public WristToPosition(Wrist wrist, double position) {
+  /** Creates a new WristWithJoystick. */
+  public WristWithJoystick(XboxController joy, Wrist wrist) {
+    this.joy = joy;
     this.wrist = wrist;
-    goingDown = false;
-    this.position = position;
 
-    pidController = new PIDController(WristConstants.WRIST_P, WristConstants.WRIST_I, WristConstants.WRIST_D);
-    addRequirements(wrist );
+    addRequirements(wrist);
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
@@ -42,7 +42,18 @@ public class WristToPosition extends Command {
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void execute() {
+    currentPosition = wrist.getThroughBore().get();
+    speed = MathUtil.applyDeadband(0.15, joy.getRightY());
+
+    goingDown = (speed < 0);
+
+    if((goingDown && currentPosition <= LOW_WRIST_POS) || (!goingDown && currentPosition >= HIGH_WRIST_POS))
+      wrist.move(0);
+    else 
+      //Divided by four to reduce speed
+      wrist.move(speed/4);
+  }
 
   // Called once the command ends or is interrupted.
   @Override

@@ -2,25 +2,38 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands;
+package frc.robot.commands.Elevator;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Elevator;
 import frc.robot.Constants.ElevatorConstants;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.XboxController;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class MoveElevatorWithJoystick extends Command {
-  /** Creates a new MoveElevatorWithJoystick. */
+public class MoveElevatorToPosition extends Command {
+
+  private PIDController elevatorPID;
+
   private Elevator elevator;
 
-  private XboxController operator;
+  public boolean goingDown;
 
-  public MoveElevatorWithJoystick(Elevator elevator, XboxController operator) {
+  private double nextPosition;
+  /** Creates a new MoveElevatorToPosition. */
+  public MoveElevatorToPosition(Elevator elevator, double nextPosition) {
 
     this.elevator = elevator;
-    this.operator = operator;
+    this.nextPosition = nextPosition;
+
+    //Placeholder values, change after testing
+    elevatorPID = new PIDController(0, 0, 0);
+
+    //Placeholder value, change later
+    elevatorPID.setTolerance(1);
+
+    goingDown = false;
 
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(elevator);
@@ -35,12 +48,26 @@ public class MoveElevatorWithJoystick extends Command {
   @Override
   public void execute() {
 
-    double speed = operator.getLeftY();
+    double currentPosition = elevator.getPosition();
 
-    //Change the clamp values after testing
+    double speed = elevatorPID.calculate(currentPosition, nextPosition);
+    
+    //If needed, change the clamp values after testing
     MathUtil.clamp(speed, -1, 1);
 
+    goingDown = currentPosition > nextPosition;
+
     elevator.moveElevator(speed);
+
+    //Prevents the elevator from trying to move down while already at the min height
+    if(goingDown && currentPosition < ElevatorConstants.BOTTOM_POSITION) {
+      elevator.stop();
+    }
+
+    //Prevents the elevator from trying to move up while already at the max height
+    if(!goingDown && currentPosition > ElevatorConstants.TOP_POSITION) {
+      elevator.stop();
+    }
 
   }
 
