@@ -43,4 +43,22 @@ public final class Constants {
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
   }
+
+  public static class ElevatorConstants {
+    //placeholder values, change as soon as possible
+
+    public static final int ELEVATORLEFT_ID = 0;
+    public static final int ELEVATORRIGHT_ID = 0;
+    public static final int ELEVATOR_ENCODER = 0;
+    public static final int LASERCAN_ID = 0;
+
+    public static final int BOTTOM_POSITION = 0;
+    public static final int TOP_POSITION = 0;
+
+    public static final int L1_HEIGHT = 0;
+    public static final int L2_HEIGHT = 0;
+    public static final int L3_HEIGHT = 0;
+    public static final int L4_HEIGHT = 0;
+    public static final int PROCESSOR_HEIGHT = 0;
+  }
 }
