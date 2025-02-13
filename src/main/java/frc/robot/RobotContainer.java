@@ -123,13 +123,14 @@ public class RobotContainer {
     l4Button = new POVButton(operator, 0);
     algaeButton = new POVButton(operator, 180);
 
-    //Operator buttons
+    //Operator buttons for elevator
     elevatorToL1 = new POVButton(operator, 180);
     elevatorToL2 = new POVButton(operator, 90);
     elevatorToL3 = new POVButton(operator, 270);
     elevatorToL4 = new POVButton(operator, 0);
     elevatorToProcessor = new JoystickButton(operator, XboxController.Button.kA.value);
 
+    //Operator button for climb
     climberToDeepClimb = new JoystickButton(operator, XboxController.Button.kB.value);
 
     wrist.setDefaultCommand(wristWithJoy);
@@ -161,7 +162,7 @@ private void configureBindings() {
   l4Button.onTrue(wristToL4);
   algaeButton.onTrue(wristToAlgae);
 
-  climberToDeepClimb.onTrue(moveClimberToDeepClimb);
+  climberToDeepClimb.onTrue(moveClimberToDeepClimb); // the B button
 
   // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
   new Trigger(m_exampleSubsystem::exampleCondition)
