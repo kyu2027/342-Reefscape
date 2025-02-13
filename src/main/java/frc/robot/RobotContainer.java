@@ -12,7 +12,9 @@ import frc.robot.commands.Elevator.MoveElevatorToPosition;
 import frc.robot.commands.Elevator.MoveElevatorWithJoystick;
 import frc.robot.commands.Wrist.WristToPosition;
 import frc.robot.commands.Wrist.WristWithJoystick;
+import frc.robot.commands.Climb.MoveClimberToDeepClimb;
 import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.Climber;
 import frc.robot.Constants.ElevatorConstants;
 
 import frc.robot.subsystems.*;
@@ -46,6 +48,7 @@ public class RobotContainer {
 
   private final Elevator elevator;
   private final Wrist wrist;
+  private final Climber climber;
 
   private final MoveElevatorToPosition moveElevatorProcessor;
   private final MoveElevatorToPosition moveElevatorL1;
@@ -73,6 +76,10 @@ public class RobotContainer {
   private final POVButton l4Button;
   private final POVButton algaeButton;
 
+  private final MoveClimberToDeepClimb moveClimberToDeepClimb;
+
+  private final JoystickButton climberToDeepClimb;
+
   private final CommandXboxController m_driverController;
   private final ExampleSubsystem m_exampleSubsystem;
 
@@ -86,6 +93,7 @@ public class RobotContainer {
     m_driverController = new CommandXboxController(OperatorConstants.kDriverControllerPort);
     wrist = new Wrist();
     elevator = new Elevator();
+    climber = new Climber();
 
     operator = new XboxController(1);
 
@@ -101,6 +109,9 @@ public class RobotContainer {
     moveElevatorL3 = new MoveElevatorToPosition(elevator, ElevatorConstants.L3_HEIGHT);
     moveElevatorL4 = new MoveElevatorToPosition(elevator, ElevatorConstants.L4_HEIGHT);
     moveElevatorProcessor = new MoveElevatorToPosition(elevator, ElevatorConstants.PROCESSOR_HEIGHT);
+
+    //Creates a command telling the climber to go to deep climb
+    moveClimberToDeepClimb = new MoveClimberToDeepClimb(climber);
 
     wristWithJoy = new WristWithJoystick(operator, wrist);
     moveElevatorWithJoystick = new MoveElevatorWithJoystick(elevator, operator);
@@ -118,6 +129,8 @@ public class RobotContainer {
     elevatorToL3 = new POVButton(operator, 270);
     elevatorToL4 = new POVButton(operator, 0);
     elevatorToProcessor = new JoystickButton(operator, XboxController.Button.kA.value);
+
+    climberToDeepClimb = new JoystickButton(operator, XboxController.Button.kB.value);
 
     wrist.setDefaultCommand(wristWithJoy);
     elevator.setDefaultCommand(moveElevatorWithJoystick);
@@ -147,6 +160,8 @@ private void configureBindings() {
   l2Button.onTrue(wristToL2);
   l4Button.onTrue(wristToL4);
   algaeButton.onTrue(wristToAlgae);
+
+  climberToDeepClimb.onTrue(moveClimberToDeepClimb);
 
   // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
   new Trigger(m_exampleSubsystem::exampleCondition)
