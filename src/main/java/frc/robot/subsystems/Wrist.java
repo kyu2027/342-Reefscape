@@ -54,7 +54,7 @@ public class Wrist extends SubsystemBase {
     goingDown = false;
 
     //Wrist idle mode & smart current limit
-    wristConfig.smartCurrentLimit(30).idleMode(IdleMode.kBrake);
+    wristConfig.smartCurrentLimit(60).idleMode(IdleMode.kBrake);
 
     //Encoder instantiation
     throughBore = new DutyCycleEncoder(0);

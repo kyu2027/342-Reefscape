@@ -53,7 +53,7 @@ public class Elevator extends SubsystemBase {
 
     elevatorLeftMotorConfig
       .idleMode(IdleMode.kBrake)
-      .smartCurrentLimit(30);
+      .smartCurrentLimit(60);
 
     /*
      * kResetSafeParameters resets all safe writable parameters before applying the
@@ -67,7 +67,7 @@ public class Elevator extends SubsystemBase {
 
     elevatorRightMotorConfig
       .idleMode(IdleMode.kBrake)
-      .smartCurrentLimit(30)
+      .smartCurrentLimit(60)
       .follow(elevatorLeftMotor)
       //If needed, change the value of inverted after testing
       .inverted(true);
