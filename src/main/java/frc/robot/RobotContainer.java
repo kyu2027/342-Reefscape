@@ -12,7 +12,6 @@ import frc.robot.commands.Elevator.MoveElevatorToPosition;
 import frc.robot.commands.Elevator.MoveElevatorWithJoystick;
 import frc.robot.commands.Wrist.WristToPosition;
 import frc.robot.commands.Wrist.WristWithJoystick;
-import frc.robot.commands.Climb.MoveClimberToDeepClimb;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Climber;
 import frc.robot.Constants.ElevatorConstants;
@@ -76,8 +75,6 @@ public class RobotContainer {
   private final POVButton l4Button;
   private final POVButton algaeButton;
 
-  private final MoveClimberToDeepClimb moveClimberToDeepClimb;
-
   private final JoystickButton climberToDeepClimb;
 
   private final CommandXboxController m_driverController;
@@ -109,9 +106,6 @@ public class RobotContainer {
     moveElevatorL3 = new MoveElevatorToPosition(elevator, ElevatorConstants.L3_HEIGHT);
     moveElevatorL4 = new MoveElevatorToPosition(elevator, ElevatorConstants.L4_HEIGHT);
     moveElevatorProcessor = new MoveElevatorToPosition(elevator, ElevatorConstants.PROCESSOR_HEIGHT);
-
-    //Creates a command telling the climber to go to deep climb
-    moveClimberToDeepClimb = new MoveClimberToDeepClimb(climber);
 
     wristWithJoy = new WristWithJoystick(operator, wrist);
     moveElevatorWithJoystick = new MoveElevatorWithJoystick(elevator, operator);
@@ -161,8 +155,6 @@ private void configureBindings() {
   l2Button.onTrue(wristToL2);
   l4Button.onTrue(wristToL4);
   algaeButton.onTrue(wristToAlgae);
-
-  climberToDeepClimb.onTrue(moveClimberToDeepClimb); // the B button
 
   // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
   new Trigger(m_exampleSubsystem::exampleCondition)
