@@ -13,7 +13,6 @@ import frc.robot.commands.Elevator.MoveElevatorWithJoystick;
 import frc.robot.commands.Wrist.WristToPosition;
 import frc.robot.commands.Wrist.WristWithJoystick;
 import frc.robot.subsystems.Elevator;
-import frc.robot.subsystems.Climber;
 import frc.robot.Constants.ElevatorConstants;
 
 import frc.robot.subsystems.*;
@@ -47,7 +46,6 @@ public class RobotContainer {
 
   private final Elevator elevator;
   private final Wrist wrist;
-  private final Climber climber;
 
   private final MoveElevatorToPosition moveElevatorProcessor;
   private final MoveElevatorToPosition moveElevatorL1;
@@ -90,7 +88,6 @@ public class RobotContainer {
     m_driverController = new CommandXboxController(OperatorConstants.kDriverControllerPort);
     wrist = new Wrist();
     elevator = new Elevator();
-    climber = new Climber();
 
     operator = new XboxController(1);
 

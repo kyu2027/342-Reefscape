@@ -66,12 +66,4 @@ public final class Constants {
     public static final int L4_HEIGHT = 0;
     public static final int PROCESSOR_HEIGHT = 0;
   }
-
-  public static class ClimbConstants {
-
-    public static final int CLIMB_MOTOR_ID = 0;
-    public static final int CLIMB_ENCODER_ID = 0;
-    public static final double DEEP_CLIMB_POSITION = 0;
-
-  }
 }
