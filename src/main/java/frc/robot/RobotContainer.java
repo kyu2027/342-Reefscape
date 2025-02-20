@@ -11,7 +11,7 @@ import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.commands.Elevator.MoveElevatorToPosition;
 import frc.robot.commands.Elevator.MoveElevatorWithJoystick;
 import frc.robot.subsystems.Elevator;
-import frc.robot.Constants.ElevatorConstants;
+import static frc.robot.Constants.ElevatorConstants.*;
 
 import frc.robot.subsystems.*;
 
@@ -68,11 +68,11 @@ public class RobotContainer {
     operator = new XboxController(1);
 
     //Creates commands telling the elevator to go to different coral branches
-    moveElevatorL1 = new MoveElevatorToPosition(elevator, ElevatorConstants.L1_HEIGHT);
-    moveElevatorL2 = new MoveElevatorToPosition(elevator, ElevatorConstants.L2_HEIGHT);
-    moveElevatorL3 = new MoveElevatorToPosition(elevator, ElevatorConstants.L3_HEIGHT);
-    moveElevatorL4 = new MoveElevatorToPosition(elevator, ElevatorConstants.L4_HEIGHT);
-    moveElevatorProcessor = new MoveElevatorToPosition(elevator, ElevatorConstants.PROCESSOR_HEIGHT);
+    moveElevatorL1 = new MoveElevatorToPosition(elevator, L1_HEIGHT);
+    moveElevatorL2 = new MoveElevatorToPosition(elevator, L2_HEIGHT);
+    moveElevatorL3 = new MoveElevatorToPosition(elevator, L3_HEIGHT);
+    moveElevatorL4 = new MoveElevatorToPosition(elevator, L4_HEIGHT);
+    moveElevatorProcessor = new MoveElevatorToPosition(elevator, PROCESSOR_HEIGHT);
 
     moveElevatorWithJoystick = new MoveElevatorWithJoystick(elevator, operator);
 
