@@ -5,7 +5,7 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.ElevatorConstants;
+import static frc.robot.Constants.ElevatorConstants.*;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -13,8 +13,8 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import au.grapplerobotics.LaserCan;
 
 public class Elevator extends SubsystemBase {
@@ -24,8 +24,6 @@ public class Elevator extends SubsystemBase {
 
   private DutyCycleEncoder elevatorEncoder;
 
-  private PIDController elevatorPID;
-
   private SparkMaxConfig elevatorLeftMotorConfig;
   private SparkMaxConfig elevatorRightMotorConfig;
 
@@ -33,13 +31,10 @@ public class Elevator extends SubsystemBase {
 
   /** Creates a new Elevator. */
   public Elevator() {
-    elevatorLeftMotor = new SparkMax(ElevatorConstants.ELEVATORLEFT_ID, MotorType.kBrushless);
-    elevatorRightMotor = new SparkMax(ElevatorConstants.ELEVATORRIGHT_ID, MotorType.kBrushless);
+    elevatorLeftMotor = new SparkMax(ELEVATORLEFT_ID, MotorType.kBrushless);
+    elevatorRightMotor = new SparkMax(ELEVATORRIGHT_ID, MotorType.kBrushless);
 
-    elevatorEncoder = new DutyCycleEncoder(ElevatorConstants.ELEVATOR_ENCODER);
-
-    //Placeholder values, change after testing
-    elevatorPID = new PIDController(0, 0, 0);
+    elevatorEncoder = new DutyCycleEncoder(ELEVATOR_ENCODER);
 
     /*
      * Configure the LaserCAN using the GrappleHook app as some of the code throws a 
@@ -47,7 +42,7 @@ public class Elevator extends SubsystemBase {
      * interference from ambient light, but it only goes up to 1.3 meters while Long 
      * ranging mode goes up to 4 meters.
      */
-    elevatorLaserCan = new LaserCan(ElevatorConstants.LASERCAN_ID);
+    elevatorLaserCan = new LaserCan(LASERCAN_ID);
 
     elevatorLeftMotorConfig = new SparkMaxConfig();
 
@@ -98,6 +93,13 @@ public class Elevator extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    super.initSendable(builder);
+
     SmartDashboard.putNumber("Elevator Position", getPosition());
   }
+
 }
