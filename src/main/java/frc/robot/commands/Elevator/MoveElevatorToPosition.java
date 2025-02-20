@@ -9,7 +9,6 @@ import frc.robot.subsystems.Elevator;
 import frc.robot.Constants.ElevatorConstants;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.XboxController;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class MoveElevatorToPosition extends Command {
