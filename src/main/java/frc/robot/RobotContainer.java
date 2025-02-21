@@ -7,33 +7,25 @@ package frc.robot;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
 import frc.robot.commands.ExampleCommand;
-import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.commands.Elevator.MoveElevatorToPosition;
 import frc.robot.commands.Elevator.MoveElevatorWithJoystick;
 import frc.robot.commands.Wrist.WristToPosition;
 import frc.robot.commands.Wrist.WristWithJoystick;
-import frc.robot.subsystems.Elevator;
 import frc.robot.Constants.ElevatorConstants;
+
 
 import frc.robot.subsystems.*;
 
-import static frc.robot.Constants.WristConstants.ALGAE_POSITION;
-import static frc.robot.Constants.WristConstants.L1_POSITION;
-import static frc.robot.Constants.WristConstants.L2_POSITION;
-import static frc.robot.Constants.WristConstants.L4_POSITION;
+import static frc.robot.Constants.WristConstants.*;
 
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.Subsystem;
-import frc.robot.Constants.WristConstants.*;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -44,8 +36,15 @@ import frc.robot.Constants.WristConstants.*;
 public class RobotContainer {
   private final XboxController operator;
 
-  private final Elevator elevator;
   private final Wrist wrist;
+  private final Elevator elevator;
+  
+  //Because the angles are the same for both L2 & L3, there will only be an L2 command that will be used for both
+  private final WristToPosition wristToIntake;
+  private final WristToPosition wristToL1;
+  private final WristToPosition wristToL2;
+  private final WristToPosition wristToL4;
+  private final WristToPosition wristToAlgae;
 
   private final MoveElevatorToPosition moveElevatorProcessor;
   private final MoveElevatorToPosition moveElevatorL1;
@@ -60,11 +59,12 @@ public class RobotContainer {
   private final POVButton elevatorToL3;
   private final POVButton elevatorToL4;
 
-  //Because the angles are the same for both L2 & L3, there will only be an L2 command that will be used for both
-  private final WristToPosition wristToL1;
-  private final WristToPosition wristToL2;
-  private final WristToPosition wristToL4;
-  private final WristToPosition wristToAlgae;
+  // private final SequentialCommandGroup goToIntake;
+  // private final SequentialCommandGroup goToL1;
+  // private final SequentialCommandGroup goToL2;
+  // private final SequentialCommandGroup goToL3;
+  // private final SequentialCommandGroup goToL4;
+  // private final SequentialCommandGroup goToProcessor;
 
   private final WristWithJoystick wristWithJoy;
 
@@ -72,6 +72,9 @@ public class RobotContainer {
   private final POVButton l2Button;
   private final POVButton l4Button;
   private final POVButton algaeButton;
+
+  private final JoystickButton lowFunnelButton;
+  private final JoystickButton highFunnelButton;
 
   private final CommandXboxController m_driverController;
   private final ExampleSubsystem m_exampleSubsystem;
@@ -81,15 +84,17 @@ public class RobotContainer {
     // The robot's subsystems and commands are defined here...
     m_exampleSubsystem = new ExampleSubsystem();
   
-
     // Replace with CommandPS4Controller or CommandJoystick if needed
     m_driverController = new CommandXboxController(OperatorConstants.kDriverControllerPort);
     wrist = new Wrist();
     elevator = new Elevator();
 
+    SmartDashboard.putData(wrist);
+
     operator = new XboxController(1);
 
     //Creates commands telling the wrist to go to different coral branches
+    wristToIntake = new WristToPosition(wrist, INTAKE_POSITION);
     wristToL1 = new WristToPosition(wrist, L1_POSITION);
     wristToL2 = new WristToPosition(wrist, L2_POSITION);
     wristToL4 = new WristToPosition(wrist, L4_POSITION);
@@ -105,8 +110,8 @@ public class RobotContainer {
     wristWithJoy = new WristWithJoystick(operator, wrist);
     moveElevatorWithJoystick = new MoveElevatorWithJoystick(elevator, operator);
 
-
     //Creating new buttons for L1, L2/L3, L4, and algae
+     //Creating new buttons for L1, L2/L3, L4, and algae
     l1Button = new POVButton(operator, 90);
     l2Button = new POVButton(operator, 270);
     l4Button = new POVButton(operator, 0);
@@ -119,8 +124,10 @@ public class RobotContainer {
     elevatorToL4 = new POVButton(operator, 0);
     elevatorToProcessor = new JoystickButton(operator, XboxController.Button.kA.value);
 
-    wrist.setDefaultCommand(wristWithJoy);
-    elevator.setDefaultCommand(moveElevatorWithJoystick);
+    lowFunnelButton = new JoystickButton(operator, XboxController.Button.kLeftBumper.value);
+    highFunnelButton = new JoystickButton(operator, XboxController.Button.kRightBumper.value);
+
+    wrist.setDefaultCommand(wristToL2);
 
     // Configure the trigger bindings
     configureBindings();

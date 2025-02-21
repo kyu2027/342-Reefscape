@@ -5,33 +5,23 @@
 package frc.robot.subsystems;
 
 
-import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.util.sendable.SendableBuilder;
 
 import com.revrobotics.spark.*;
-import com.revrobotics.config.*;
 
 import static frc.robot.Constants.WristConstants.*;
 
-import java.io.ObjectInputFilter.Config;
-
-import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.spark.config.ClosedLoopConfig;
-import com.revrobotics.spark.config.SmartMotionConfig;
-import com.revrobotics.spark.config.ClosedLoopConfigAccessor;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import edu.wpi.first.wpilibj.DutyCycleEncoder;
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.util.sendable.Sendable;
+import com.revrobotics.RelativeEncoder;
 
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.XboxController;
 
 
 public class Wrist extends SubsystemBase {
@@ -39,6 +29,7 @@ public class Wrist extends SubsystemBase {
   private final SparkMaxConfig wristConfig;
   private final PIDController pidController;
   private final DutyCycleEncoder throughBore;
+  private final RelativeEncoder wristEncoder;
 
   private boolean goingDown;
 
@@ -53,15 +44,23 @@ public class Wrist extends SubsystemBase {
     pidController = new PIDController(WRIST_PID_VALUES[0], WRIST_PID_VALUES[1], WRIST_PID_VALUES[2]);
     goingDown = false;
 
-    //Wrist idle mode & smart current limit
-    wristConfig.smartCurrentLimit(30).idleMode(IdleMode.kBrake);
-
     //Encoder instantiation
-    throughBore = new DutyCycleEncoder(0);
+    throughBore = new DutyCycleEncoder(THROUGHBORE_PORT, (2 * Math.PI), WRIST_ZERO);
+    wristEncoder = wrist.getEncoder();
     
     currentPosition = throughBore.get();
+    wristEncoder.setPosition(throughBore.get());
+    
+    //Conversion factor so PID controller is able to read exactly where the throughBore is at
+    wristConfig.encoder
+      .positionConversionFactor(WRIST_POSITION_CONVERSION);
+      
+    //Wrist idle mode & smart current limit
+    wristConfig
+      .idleMode(IdleMode.kBrake)
+      .smartCurrentLimit(WRIST_CURRENT_LIMIT);
 
-  
+    wrist.configure(wristConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
 
   /*
@@ -74,20 +73,20 @@ public class Wrist extends SubsystemBase {
 
   /*
    * Moves wrist to a certain position
+   * @param speed is between -1 and 1
    */
   public void wristToPosition(double position){
+    pidController.setTolerance(WRIST_ERROR);
     speed = pidController.calculate(currentPosition, position);
-    speed = MathUtil.clamp(speed, 1, -1);
+    speed = MathUtil.clamp(speed, -1, 1);
 
-    goingDown = currentPosition < position;
-
-    pidController.setTolerance(0.1);
+    goingDown = speed < 0;
 
     //These are being used as soft stops so when we're tuning the PID values the wrist won't slam into the mechanical stops
     if((goingDown && currentPosition <= LOW_WRIST_POS) || (!goingDown && currentPosition >= HIGH_WRIST_POS))
-    move(0);
+      move(0);
     else
-    move(speed);
+      move(speed);
 
   }
 
@@ -98,10 +97,28 @@ public class Wrist extends SubsystemBase {
     return throughBore;
   }
 
+  /**
+   * VERY IMPORTANT!!! Makes sure the wrist is in the safe range so the robot doesn't critically damage itself
+   * @return
+   */
+  public boolean isSafe(){
+    return (L2_POSITION - WRIST_SAFE_ERROR < currentPosition) && (L2_POSITION + WRIST_SAFE_ERROR > currentPosition);
+  }
+
   @Override
   public void periodic() {
-    //Planning on using this to debug PID tuning and to see what the robot is thinking
-    SmartDashboard.putNumber("Wrist Position", currentPosition);
-    SmartDashboard.putNumber("Throughbore:", throughBore.get());
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder){
+    super.initSendable(builder);
+    builder.setSmartDashboardType("Wrist");
+    builder.addBooleanProperty("Is Safe", () -> isSafe(), null);
+      if(true){
+        builder.addDoubleProperty("Error", () -> throughBore.get() - wristEncoder.getPosition(), null);
+        builder.addDoubleProperty("ThroughBore", () -> throughBore.get(), null);
+        builder.addDoubleProperty("Encoder", () -> wristEncoder.getPosition(), null);
+        builder.addDoubleProperty("Speed", () -> speed, null);
+      }
   }
 }
