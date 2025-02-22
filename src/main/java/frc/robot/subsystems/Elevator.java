@@ -12,7 +12,6 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import au.grapplerobotics.LaserCan;
@@ -21,8 +20,6 @@ public class Elevator extends SubsystemBase {
 
   private SparkMax elevatorLeftMotor;
   private SparkMax elevatorRightMotor;
-
-  private DutyCycleEncoder elevatorEncoder;
 
   private SparkMaxConfig elevatorLeftMotorConfig;
   private SparkMaxConfig elevatorRightMotorConfig;
@@ -33,8 +30,6 @@ public class Elevator extends SubsystemBase {
   public Elevator() {
     elevatorLeftMotor = new SparkMax(ELEVATORLEFT_ID, MotorType.kBrushless);
     elevatorRightMotor = new SparkMax(ELEVATORRIGHT_ID, MotorType.kBrushless);
-
-    elevatorEncoder = new DutyCycleEncoder(ELEVATOR_ENCODER);
 
     /*
      * Configure the LaserCAN using the GrappleHook app as some of the code throws a 
@@ -47,6 +42,7 @@ public class Elevator extends SubsystemBase {
     elevatorLeftMotorConfig = new SparkMaxConfig();
 
     elevatorLeftMotorConfig
+      .inverted(false)
       .idleMode(IdleMode.kBrake)
       .smartCurrentLimit(60);
 
@@ -63,21 +59,21 @@ public class Elevator extends SubsystemBase {
     elevatorRightMotorConfig
       .idleMode(IdleMode.kBrake)
       .smartCurrentLimit(60)
-      .follow(elevatorLeftMotor)
-      //If needed, change the value of inverted after testing
-      .inverted(true);
+      .follow(elevatorLeftMotor, true);
 
     elevatorRightMotor.configure(elevatorRightMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
   }
 
-  /*
-   * This method returns the value of the absolute encoder.
-   * The .getPosition() method does not work anymore, and as far as I know
-   * .get() returns the exact same value.
-   */
-  public double getPosition() {
-    return elevatorEncoder.get();
+  //Returns the reading of the laserCAN in millimeters
+  public int getLaserCanReading() {
+    return elevatorLaserCan.getMeasurement().distance_mm;
+  }
+
+  //Returns true if an object is _ millimeters to the bottom of the elevator;
+  public boolean objectTooClose() {
+    //Placeholder values, change after figuring out how close the elevator is to the ground
+    return getLaserCanReading() == 0;
   }
 
   //This method will set the elevator motors to the inputted value
@@ -99,7 +95,7 @@ public class Elevator extends SubsystemBase {
   public void initSendable(SendableBuilder builder) {
     super.initSendable(builder);
 
-    SmartDashboard.putNumber("Elevator Position", getPosition());
+    SmartDashboard.putNumber("LaserCAN Reading", getLaserCanReading());
   }
 
 }

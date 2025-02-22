@@ -6,7 +6,7 @@ package frc.robot.commands.Elevator;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Elevator;
-import frc.robot.Constants.ElevatorConstants;
+import static frc.robot.Constants.ElevatorConstants.*;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.MathUtil;
 
@@ -17,7 +17,9 @@ public class MoveElevatorToPosition extends Command {
 
   private Elevator elevator;
 
-  public boolean goingDown;
+  private boolean goingDown;
+  private boolean tooLow;
+  private boolean tooHigh;
 
   private double nextPosition;
   /** Creates a new MoveElevatorToPosition. */
@@ -29,10 +31,11 @@ public class MoveElevatorToPosition extends Command {
     //Placeholder values, change after testing
     elevatorPID = new PIDController(0, 0, 0);
 
-    //Placeholder value, change later
-    elevatorPID.setTolerance(1);
+    goingDown = elevator.getLaserCanReading() > nextPosition;
 
-    goingDown = false;
+    //Placeholder values, change these values before testing
+    tooLow = elevator.getLaserCanReading() < BOTTOM_POSITION;
+    tooHigh = elevator.getLaserCanReading() > TOP_POSITION;
 
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(elevator);
@@ -47,34 +50,25 @@ public class MoveElevatorToPosition extends Command {
   @Override
   public void execute() {
 
-    double currentPosition = elevator.getPosition();
+    double currentPosition = elevator.getLaserCanReading();
 
-    double speed = elevatorPID.calculate(currentPosition, nextPosition);
-    
-    //If needed, change the clamp values after testing
+    double speed = -elevatorPID.calculate(currentPosition, nextPosition) / 20000;
+
     MathUtil.clamp(speed, -1, 1);
 
     goingDown = currentPosition > nextPosition;
 
-    elevator.moveElevator(speed);
-
-    //Prevents the elevator from trying to move down while already at the min height
-    if(goingDown && currentPosition < ElevatorConstants.BOTTOM_POSITION) {
-      elevator.stop();
-    }
-
-    //Prevents the elevator from trying to move up while already at the max height
-    if(!goingDown && currentPosition > ElevatorConstants.TOP_POSITION) {
-      elevator.stop();
+    if(elevator.objectTooClose() || (goingDown && tooLow) || (!goingDown && tooHigh)) {
+      speed = -elevatorPID.calculate(currentPosition, currentPosition);
+    }else{
+      elevator.moveElevator(speed);
     }
 
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {
-    elevator.stop();
-  }
+  public void end(boolean interrupted) {}
 
   // Returns true when the command should end.
   @Override
