@@ -24,9 +24,15 @@ public class Robot extends TimedRobot {
    * initialization code.
    */
   public Robot() {
+
+    /*
+     * IMPORTANT, DO NOT DELETE
+     * This allows the laserCAN to communicate with the roborio
+     */
+    CanBridge.runTCP();
+
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
-    CanBridge.runTCP();
 
     m_robotContainer = new RobotContainer();
   }
