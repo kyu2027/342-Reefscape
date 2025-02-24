@@ -54,7 +54,7 @@ public class MoveElevatorToPosition extends Command {
 
     double speed = -elevatorPID.calculate(currentPosition, nextPosition) / 20000;
 
-    MathUtil.clamp(speed, -1, 1);
+    speed = MathUtil.clamp(speed, -1, 1);
 
     goingDown = currentPosition > nextPosition;
 

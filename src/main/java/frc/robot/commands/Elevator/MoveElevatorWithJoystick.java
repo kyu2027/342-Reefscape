@@ -37,7 +37,7 @@ public class MoveElevatorWithJoystick extends Command {
     double speed = operator.getLeftY();
 
     //Change the clamp values after testing
-    MathUtil.clamp(speed, -1, 1);
+    speed = MathUtil.clamp(speed, -1, 1);
 
     elevator.moveElevator(speed);
 
