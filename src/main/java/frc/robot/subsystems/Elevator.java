@@ -95,7 +95,9 @@ public class Elevator extends SubsystemBase {
   public void initSendable(SendableBuilder builder) {
     super.initSendable(builder);
 
-    SmartDashboard.putNumber("LaserCAN Reading", getLaserCanReading());
+    builder.setSmartDashboardType("Elevator");
+
+    builder.addDoubleProperty("LaserCAN Reading", () -> getLaserCanReading(), null);
   }
 
 }
