@@ -52,7 +52,7 @@ public class MoveElevatorToPosition extends Command {
 
     double currentPosition = elevator.getLaserCanReading();
 
-    double speed = -elevatorPID.calculate(currentPosition, nextPosition) / 20000;
+    double speed = -elevatorPID.calculate(currentPosition, nextPosition) / 30000;
 
     speed = MathUtil.clamp(speed, -1, 1);
 
