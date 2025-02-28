@@ -24,17 +24,17 @@ public final class Constants {
   public static class WristConstants {
     //public static final int INTAKE_SENSOR = 1;
   
-    public static final int WRIST_ID = 5;
-    public static final int THROUGHBORE_PORT = 2;
+    public static final int WRIST_ID = 11;
+    public static final int THROUGHBORE_PORT = 8;
   
-    public static final double WRIST_GEAR_RATIO = 1/2.0;
+    public static final double WRIST_GEAR_RATIO = 1/45.0;
     public static final double WRIST_SPEED_LIMITER = 4.0;
     public static final double WRIST_POSITION_CONVERSION = (WRIST_GEAR_RATIO) * (2 * Math.PI);
     public static final int WRIST_CURRENT_LIMIT = 30;
-    public static final double WRIST_ZERO = 0;
+    public static final double WRIST_ZERO = 0.336;
 
     //Wrist PID values; they're a list for sake of simplicity
-    public static final double[] WRIST_PID_VALUES = {1, 0, 0.01};
+    public static final double[] WRIST_PID_VALUES = {0.3, 0, 0.1};
     public static final double WRIST_ERROR = 0.1;
   
     //Wrist position Values (absolute enocder values I think)
@@ -46,9 +46,10 @@ public final class Constants {
     //All positions are in radians
     public static final double INTAKE_POSITION = 0.0;
     public static final double L1_POSITION = 0.0;
-    public static final double L2_POSITION = 0.0;
-    public static final double L4_POSITION = 0.0;
-    public static final double ALGAE_POSITION = 0.0;
+    public static final double L2_POSITION = 0.39;
+    public static final double L4_POSITION = 1.049;
+    public static final double ALGAE_POSITION = 3.15;
+    public static final double BARGE_POSITION = 0.92;
 
     public static final double WRIST_SAFE_ERROR = Math.toRadians(5);
   
@@ -60,8 +61,8 @@ public final class Constants {
   public static class ElevatorConstants {
     //placeholder values, change as soon as possible
 
-    public static final int ELEVATORLEFT_ID = 0;
-    public static final int ELEVATORRIGHT_ID = 0;
+    public static final int ELEVATORLEFT_ID = 9;
+    public static final int ELEVATORRIGHT_ID = 10;
     public static final int ELEVATOR_ENCODER = 0;
     public static final int LASERCAN_ID = 0;
 

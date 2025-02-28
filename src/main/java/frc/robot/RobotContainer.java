@@ -14,6 +14,7 @@ import frc.robot.commands.Wrist.WristToPosition;
 import frc.robot.commands.Wrist.WristWithJoystick;
 import frc.robot.Constants.ElevatorConstants;
 
+
 import frc.robot.subsystems.*;
 
 import static frc.robot.Constants.WristConstants.*;
@@ -45,10 +46,10 @@ public class RobotContainer {
   
   //Because the angles are the same for both L2 & L3, there will only be an L2 command that will be used for both
   private final WristToPosition wristToIntake;
-  private final WristToPosition wristToL1;
   private final WristToPosition wristToL2;
   private final WristToPosition wristToL4;
   private final WristToPosition wristToAlgae;
+  private final WristToPosition wristToBarge;
 
   private final MoveElevatorToPosition moveElevatorProcessor;
   private final MoveElevatorToPosition moveElevatorL1;
@@ -110,10 +111,10 @@ public class RobotContainer {
 
     //Creates commands telling the wrist to go to different coral branches
     wristToIntake = new WristToPosition(wrist, INTAKE_POSITION);
-    wristToL1 = new WristToPosition(wrist, L1_POSITION);
     wristToL2 = new WristToPosition(wrist, L2_POSITION);
     wristToL4 = new WristToPosition(wrist, L4_POSITION);
     wristToAlgae = new WristToPosition(wrist, ALGAE_POSITION);
+    wristToBarge = new WristToPosition(wrist, BARGE_POSITION);
 
     //Creates commands telling the elevator to go to different coral branches
     moveElevatorL1 = new MoveElevatorToPosition(elevator, ElevatorConstants.L1_HEIGHT);
@@ -181,7 +182,7 @@ private void configureBindings() {
   elevatorToProcessor.onTrue(moveElevatorProcessor); // the A button
 
   //Moves the wrist to a certain position based on what button is pressed
-  l1Button.onTrue(wristToL1);
+  l1Button.onTrue(wristToIntake);
   l2Button.onTrue(wristToL2);
   l4Button.onTrue(wristToL4);
   algaeButton.onTrue(wristToAlgae);
