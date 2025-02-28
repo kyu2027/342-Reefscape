@@ -4,9 +4,18 @@
 
 package frc.robot.subsystems;
 
+import java.io.IOException;
+import java.util.function.BooleanSupplier;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+
 import javax.print.attribute.standard.MediaSize.NA;
 
+import org.json.simple.parser.ParseException;
+
 import com.fasterxml.jackson.core.filter.FilteringGeneratorDelegate;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.RobotConfig;
 import com.studica.frc.AHRS;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -23,6 +32,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
 public class SwerveDrive extends SubsystemBase {
@@ -39,6 +49,15 @@ public class SwerveDrive extends SubsystemBase {
   private SwerveModule frontRightModule;
   private SwerveModule backLeftModule;
   private SwerveModule backRightModule; 
+
+  private Supplier<Pose2d> poseSupplier;
+  private Consumer<Pose2d> resetPoseConsumer;
+  private Consumer<ChassisSpeeds> robotRelativeOutput;
+  private Supplier<ChassisSpeeds> chasisSpeedSupplier;
+  private BooleanSupplier shouldFlipSupplier;
+  private RobotConfig config;
+  private Field2d feild;
+
 
   SwerveModuleState[] swerveModuleStates;
   SwerveModulePosition[] swerveModulePositions;
@@ -106,11 +125,41 @@ public class SwerveDrive extends SubsystemBase {
 
         fieldOriented = false;
 
-  }
+      poseSupplier = () -> getPose2d();
+      resetPoseConsumer = pose -> resetOdometry(pose);
+      robotRelativeOutput = chassisSpeeds -> drive(chassisSpeeds);
+      chasisSpeedSupplier = () -> getChassisSpeeds();
+      shouldFlipSupplier = () -> false;
+
+        try {
+          config = RobotConfig.fromGUISettings();
+        } catch (IOException e) {
+          e.printStackTrace();
+        } catch (ParseException e) {
+          e.printStackTrace();
+        }    
+
+        feild = new Field2d();
+
+        new Thread(() -> {
+          try {
+            Thread.sleep(1000);
+            NavX.reset();
+          } catch (Exception e) {}
+        }).start();
+
+        configureAutoBuilder();
+    }
 
     public void toggleFieldOriented (){
       
       fieldOriented = !fieldOriented;
+
+    }
+
+    public ChassisSpeeds getChassisSpeeds(){
+
+      return new ChassisSpeeds(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond, chassisSpeeds.omegaRadiansPerSecond);
 
     }
 
@@ -172,6 +221,27 @@ public class SwerveDrive extends SubsystemBase {
         backLeftModule.stop();
         backRightModule.stop();
     }
+
+    public Pose2d getPose2d(){
+      return odometry.getPoseMeters();
+    }
+
+    public void resetOdometry(Pose2d pose){
+       odometry.resetPosition(NavX.getRotation2d(), getCurrentSwerveModulePositions(), pose);
+    }
+
+    public void configureAutoBuilder() {
+      AutoBuilder.configure(
+        poseSupplier, 
+        resetPoseConsumer, 
+        chasisSpeedSupplier, 
+        robotRelativeOutput, 
+        DriveConstants.PATH_CONFIG_CONTROLLER, 
+        config, 
+        shouldFlipSupplier,
+        this
+        );
+    }
     
 
     public void putFrontLeftValues(SendableBuilder sendableBuilder){
@@ -218,6 +288,9 @@ public class SwerveDrive extends SubsystemBase {
 
     sendableBuilder.addBooleanProperty("Field Orienated", ()-> fieldOriented, null);
     sendableBuilder.addDoubleProperty("Gyro Reading", ()-> NavX.getAngle(), null);
+
+    sendableBuilder.addDoubleProperty("FL Distance Travlled", ()-> frontLeftModule.getDistance(), null);
+    sendableBuilder.addDoubleProperty("FL Velocity", ()-> frontLeftModule.getDriveVelocity(), null);
 
   }
       

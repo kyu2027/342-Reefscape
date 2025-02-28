@@ -25,6 +25,20 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.subsystems.ExampleSubsystem;
+import frc.robot.subsystems.SwerveDrive;
+
+import com.pathplanner.lib.commands.PathPlannerAuto;
+
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.shuffleboard.SendableCameraWrapper;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -89,10 +103,10 @@ public class RobotContainer {
   private final JoystickButton highFunnelButton;
 
   private final CommandXboxController m_driverController;
-  private final ExampleSubsystem m_exampleSubsystem;
+
 
   // The robot's subsystems and commands are defined here...
-
+  
   private SwerveDrive swerve;
   private XboxController driver;
 
@@ -100,6 +114,8 @@ public class RobotContainer {
 
   private DriveWithJoystick driveWithJoystick;
   private Command fieldOrienatedCommand;
+
+  private SendableChooser<Command> autoChooser;
 
   // down below for claw?
   private final JoystickButton xButton;
@@ -111,7 +127,6 @@ public class RobotContainer {
    */
   public RobotContainer() {
     // The robot's subsystems and commands are defined here...
-    m_exampleSubsystem = new ExampleSubsystem();
 
     // Replace with CommandPS4Controller or CommandJoystick if needed
     m_driverController = new CommandXboxController(OperatorConstants.kDriverControllerPort);
@@ -185,15 +200,19 @@ public class RobotContainer {
     fieldOrienatedButton = new JoystickButton(driver, XboxController.Button.kY.value);
     driveWithJoystick = new DriveWithJoystick(swerve, driver);
 
+
     fieldOrienatedCommand = Commands.runOnce(() -> {
       swerve.toggleFieldOriented();
     }, swerve);
 
     swerve.setDefaultCommand(driveWithJoystick);
+    autoChooser = new SendableChooser<>();
+
+    autoChooser.addOption("PathPlannerTest", new PathPlannerAuto("New Auto"));
 
     SmartDashboard.putData(swerve);
-
     SmartDashboard.putData(claw);
+    SmartDashboard.putData(autoChooser);
 
     configureBindings();
 
@@ -231,19 +250,9 @@ public class RobotContainer {
     aButton.whileTrue(outtakeButton);
     yButton.whileTrue(intakeCommand);
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
-    new Trigger(m_exampleSubsystem::exampleCondition)
-        .onTrue(new ExampleCommand(m_exampleSubsystem));
-
-    // Schedule `exampleMethodCommand` when the Xbox controller's B button is
-    // pressed,
-    // cancelling on release.
-
-    // Schedule `exampleMethodCommand` when the Xbox controller's B button is
-    // pressed,
-    // cancelling on release.
-    m_driverController.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
 
     fieldOrienatedButton.whileTrue(fieldOrienatedCommand);
+
   }
 
   /**
@@ -253,6 +262,6 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
-    return Autos.exampleAuto(m_exampleSubsystem);
+    return autoChooser.getSelected();
   }
 }
