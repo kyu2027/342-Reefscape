@@ -107,6 +107,9 @@ public class Wrist extends SubsystemBase {
     return throughBore;
   }
 
+  /*
+   * returns the relative position of the wrist
+   */
   public double getPosition() {
     return wristEncoder.getPosition();
   }
