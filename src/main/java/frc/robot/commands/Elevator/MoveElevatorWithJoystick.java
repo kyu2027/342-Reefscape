@@ -6,7 +6,6 @@ package frc.robot.commands.Elevator;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Elevator;
-import frc.robot.Constants.ElevatorConstants;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.XboxController;
 
@@ -35,10 +34,14 @@ public class MoveElevatorWithJoystick extends Command {
   @Override
   public void execute() {
 
-    double speed = operator.getLeftY();
-
-    //Change the clamp values after testing
-    MathUtil.clamp(speed, -1, 1);
+    /*
+     * Elevator is slowed right now to prevent damages during testing.
+     * Still don't know if we'll let it go full speed once everything
+     * is figured out.
+     */
+    double speed = -operator.getLeftY() / 3;
+    speed = MathUtil.clamp(speed, -.1, .3);
+    System.out.println("The joystick speed is inputting " + operator.getLeftY());
 
     elevator.moveElevator(speed);
 
@@ -46,9 +49,7 @@ public class MoveElevatorWithJoystick extends Command {
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {
-    elevator.stop();
-  }
+  public void end(boolean interrupted) {}
 
   // Returns true when the command should end.
   @Override
