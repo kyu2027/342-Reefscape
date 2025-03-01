@@ -34,10 +34,9 @@ public class MoveElevatorWithJoystick extends Command {
   @Override
   public void execute() {
 
-    double speed = operator.getLeftY();
-
-    //Change the clamp values after testing
+    double speed = -operator.getLeftY() / 4;
     speed = MathUtil.clamp(speed, -1, 1);
+    System.out.println("The joystick speed is inputting " + operator.getLeftY());
 
     elevator.moveElevator(speed);
 
