@@ -37,9 +37,9 @@ public final class Constants {
      * the numbers on the right is what the laserCAN reads.
      */
     public static final double L1_HEIGHT = 0.0;
-    public static final double L2_HEIGHT = /**241.7*/ 300.0;
-    public static final double L3_HEIGHT = /**624.58*/ 485.0;
-    public static final double L4_HEIGHT = /**1360.0*/ 850.0;
+    public static final double L2_HEIGHT = 241.7 /**300.0*/;
+    public static final double L3_HEIGHT = 624.58 /**485.0*/;
+    public static final double L4_HEIGHT = 1360.0 /**850.0*/;
     public static final double PROCESSOR_HEIGHT = 0.0;
   }
 }
