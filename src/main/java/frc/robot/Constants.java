@@ -56,7 +56,7 @@ public final class Constants {
     // All positions are in radians
     public static final double INTAKE_POSITION = 0.0;
     public static final double L1_POSITION = 0.0;
-    public static final double L2_POSITION = 0.39;
+    public static final double L2_POSITION = 0.441;
     public static final double L4_POSITION = 1.049;
     public static final double ALGAE_POSITION = 2.504;
     public static final double BARGE_POSITION = 0.92;
@@ -79,6 +79,7 @@ public final class Constants {
 
     public static final double BOTTOM_POSITION = 0.0;
     public static final double TOP_POSITION = 1400.0;
+    public static final double ELEVATOR_ERROR = 10.0;
 
     /*
      * Still tuning values for positions because
@@ -88,8 +89,8 @@ public final class Constants {
      */
     public static final double L1_HEIGHT = 0.0;
     public static final double L2_HEIGHT = 241.7 /**300.0*/;
-    public static final double L3_HEIGHT = 624.58 /**485.0*/;
-    public static final double L4_HEIGHT = 1360.0 /**850.0*/;
+    public static final double L3_HEIGHT = 644.58 /**485.0*/;
+    public static final double L4_HEIGHT = 1400.0 /**850.0*/;
     public static final double PROCESSOR_HEIGHT = 0.0;
   }
 
