@@ -37,7 +37,7 @@ public class Elevator extends SubsystemBase {
 
   private SparkMaxConfig elevatorLeftMotorConfig;
   private SparkMaxConfig elevatorRightMotorConfig;
-  private MAXMotionConfig elevatorPIDConfig;
+  //private MAXMotionConfig elevatorPIDConfig;
 
   private LaserCan elevatorLaserCan;
 
@@ -51,7 +51,7 @@ public class Elevator extends SubsystemBase {
 
     elevatorPID = elevatorRightMotor.getClosedLoopController();
 
-    elevatorPIDConfig = new MAXMotionConfig();
+    //elevatorPIDConfig = new MAXMotionConfig();
 
     /*
      * Configure the LaserCAN using the GrappleHook app as some of the code throws a 
