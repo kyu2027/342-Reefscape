@@ -7,6 +7,7 @@ package frc.robot;
 import frc.robot.commands.Autos;
 import frc.robot.commands.DriveWithJoystick;
 import frc.robot.commands.ExampleCommand;
+import frc.robot.commands.SpinClaw;
 import frc.robot.commands.Elevator.MoveElevatorToPosition;
 import frc.robot.commands.Elevator.MoveElevatorWithJoystick;
 import frc.robot.commands.Wrist.WristToPosition;
@@ -16,6 +17,9 @@ import frc.robot.subsystems.*;
 
 import static frc.robot.Constants.ElevatorConstants.*;
 import static frc.robot.Constants.WristConstants.*;
+
+import java.io.Writer;
+import java.security.AlgorithmConstraints;
 
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -43,6 +47,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -89,13 +94,14 @@ public class RobotContainer {
 
   private final POVButton l1Button;
   private final POVButton l2Button;
+  private final JoystickButton l3Button;
   private final POVButton l4Button;
   private final POVButton algaeButton;
 
   private final Claw claw;
   private Command onStop;
   private Command outtakeButton;
-  private Command intakeCommand;
+  private SpinClaw intakeCommand;
 
   private final JoystickButton lowFunnelButton;
   private final JoystickButton highFunnelButton;
@@ -138,9 +144,8 @@ public class RobotContainer {
     outtakeButton = Commands.runOnce(() -> {
       claw.outTakeCoral();
     }, claw);
-    intakeCommand = Commands.run(() -> {
-      claw.intakeCoral();
-    }, claw);
+    intakeCommand = new SpinClaw(claw);
+    
 
     SmartDashboard.putData(wrist);
 
@@ -164,15 +169,55 @@ public class RobotContainer {
     moveElevatorWithJoystick = new MoveElevatorWithJoystick(elevator, operator);
 
     // Creating sequential command groups that use wrist and elevator
-    goToIntake = new SequentialCommandGroup(wristToAlgae, moveElevatorL1, wristToIntake);
-    goToL2 = new SequentialCommandGroup(wristToAlgae, moveElevatorL2, wristToL2);
-    goToL3 = new SequentialCommandGroup(wristToAlgae, moveElevatorL3, wristToL2);
-    goToL4 = new SequentialCommandGroup(wristToAlgae, moveElevatorL4, wristToL4);
-    goToProcessor = new SequentialCommandGroup(wristToAlgae, moveElevatorL1);
+    goToIntake = new SequentialCommandGroup(
+      new WristToPosition(wrist, ALGAE_POSITION),
+      new MoveElevatorToPosition(elevator, wrist, L1_HEIGHT),
+      new ParallelCommandGroup(
+        new MoveElevatorToPosition(elevator, wrist, L1_HEIGHT, true), 
+        new WristToPosition(wrist, INTAKE_POSITION)
+      )
+    );
+
+    goToL2 = new SequentialCommandGroup(
+      new WristToPosition(wrist, ALGAE_POSITION), 
+      new MoveElevatorToPosition(elevator, wrist, L2_HEIGHT), 
+      new ParallelCommandGroup(
+        new MoveElevatorToPosition(elevator, wrist, L2_HEIGHT, true), 
+        new WristToPosition(wrist, L2_POSITION)
+      )
+    );
+
+    goToL3 = new SequentialCommandGroup(
+      new WristToPosition(wrist, ALGAE_POSITION), 
+      new MoveElevatorToPosition(elevator, wrist, L3_HEIGHT), 
+      new ParallelCommandGroup(
+        new MoveElevatorToPosition(elevator, wrist, L3_HEIGHT, true), 
+        new WristToPosition(wrist, L2_POSITION)
+      )
+    );
+
+    goToL4 = new SequentialCommandGroup(
+      new WristToPosition(wrist, ALGAE_POSITION),
+      new MoveElevatorToPosition(elevator, wrist, L4_HEIGHT),
+      new ParallelCommandGroup(
+        new MoveElevatorToPosition(elevator, wrist, L4_HEIGHT, true), 
+        new WristToPosition(wrist, L4_POSITION)
+      )
+    );
+
+    goToProcessor = new SequentialCommandGroup(
+      new WristToPosition(wrist, ALGAE_POSITION),
+      new MoveElevatorToPosition(elevator, wrist, L1_HEIGHT),
+      new ParallelCommandGroup(
+        new MoveElevatorToPosition(elevator, wrist, L1_HEIGHT, true), 
+        new WristToPosition(wrist, ALGAE_POSITION)
+      )
+    );
 
     // Creating new buttons for L1, L2/L3, L4, and algae
     l1Button = new POVButton(operator, 90);
     l2Button = new POVButton(operator, 270);
+    l3Button = new JoystickButton(operator, XboxController.Button.kB.value);
     l4Button = new POVButton(operator, 0);
     algaeButton = new POVButton(operator, 180);
 
@@ -192,7 +237,7 @@ public class RobotContainer {
     lowFunnelButton = new JoystickButton(operator, XboxController.Button.kLeftBumper.value);
     highFunnelButton = new JoystickButton(operator, XboxController.Button.kRightBumper.value);
 
-    wrist.setDefaultCommand(wristToAlgae);
+    //wrist.setDefaultCommand(wristToAlgae);
     elevator.setDefaultCommand(moveElevatorWithJoystick);
 
     // Configure the trigger bindings
@@ -243,10 +288,11 @@ public class RobotContainer {
     // elevatorToL4.onTrue(moveElevatorL4); // top button on d-pad
 
     // Moves the wrist to a certain position based on what button is pressed
-    l1Button.onTrue(goToIntake);
-    l2Button.onTrue(goToL2);
-    l4Button.onTrue(goToL4);
-    algaeButton.onTrue(goToProcessor);
+    l1Button.onTrue(goToIntake); //Right button on d-pad
+    l2Button.onTrue(goToL2); //Left button on d-pad
+    l3Button.onTrue(goToL3); //B button
+    l4Button.onTrue(goToL4); //Top button on d-pad
+    algaeButton.onTrue(goToProcessor); //Down button on d-pad
 
 
 
