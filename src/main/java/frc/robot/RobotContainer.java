@@ -8,15 +8,16 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.subsystems.ExampleSubsystem;
+import frc.robot.subsystems.Elevator;
 import frc.robot.commands.Elevator.MoveElevatorToPosition;
 import frc.robot.commands.Elevator.MoveElevatorWithJoystick;
-import frc.robot.subsystems.Elevator;
 import static frc.robot.Constants.ElevatorConstants.*;
 
 import frc.robot.subsystems.*;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -24,7 +25,6 @@ import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 
 /**
@@ -38,14 +38,12 @@ public class RobotContainer {
 
   private final Elevator elevator;
 
-  private final MoveElevatorToPosition moveElevatorProcessor;
   private final MoveElevatorToPosition moveElevatorL1;
   private final MoveElevatorToPosition moveElevatorL2;
   private final MoveElevatorToPosition moveElevatorL3;
   private final MoveElevatorToPosition moveElevatorL4;
   private final MoveElevatorWithJoystick moveElevatorWithJoystick;
 
-  private final JoystickButton elevatorToProcessor;
   private final POVButton elevatorToL1;
   private final POVButton elevatorToL2;
   private final POVButton elevatorToL3;
@@ -72,7 +70,6 @@ public class RobotContainer {
     moveElevatorL2 = new MoveElevatorToPosition(elevator, L2_HEIGHT);
     moveElevatorL3 = new MoveElevatorToPosition(elevator, L3_HEIGHT);
     moveElevatorL4 = new MoveElevatorToPosition(elevator, L4_HEIGHT);
-    moveElevatorProcessor = new MoveElevatorToPosition(elevator, PROCESSOR_HEIGHT);
 
     moveElevatorWithJoystick = new MoveElevatorWithJoystick(elevator, operator);
 
@@ -81,12 +78,13 @@ public class RobotContainer {
     elevatorToL2 = new POVButton(operator, 90);
     elevatorToL3 = new POVButton(operator, 270);
     elevatorToL4 = new POVButton(operator, 0);
-    elevatorToProcessor = new JoystickButton(operator, XboxController.Button.kA.value);
 
     elevator.setDefaultCommand(moveElevatorWithJoystick);
 
     // Configure the trigger bindings
     configureBindings();
+
+    SmartDashboard.putData(elevator);
   }
 
 /**
@@ -103,7 +101,6 @@ public class RobotContainer {
   elevatorToL2.onTrue(moveElevatorL2); // left button on d-pad
   elevatorToL3.onTrue(moveElevatorL3); // right button on d-pad
   elevatorToL4.onTrue(moveElevatorL4); // top button on d-pad
-  elevatorToProcessor.onTrue(moveElevatorProcessor); // the A button
 
   // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
   new Trigger(m_exampleSubsystem::exampleCondition)
