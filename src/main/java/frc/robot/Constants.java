@@ -58,7 +58,7 @@ public final class Constants {
     public static final double L1_POSITION = 0.0;
     public static final double L2_POSITION = 0.39;
     public static final double L4_POSITION = 1.049;
-    public static final double ALGAE_POSITION = 3.15;
+    public static final double ALGAE_POSITION = 2.504;
     public static final double BARGE_POSITION = 0.92;
 
     public static final double WRIST_SAFE_ERROR = Math.toRadians(5);
