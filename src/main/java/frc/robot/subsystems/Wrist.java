@@ -107,6 +107,10 @@ public class Wrist extends SubsystemBase {
     return throughBore;
   }
 
+  public double getPosition() {
+    return wristEncoder.getPosition();
+  }
+
   /**resets relative encoder to equal the through bore value*/
   public void resetEncoder(){
     wristEncoder.setPosition(throughBore.get());
