@@ -87,7 +87,7 @@ public class Elevator extends SubsystemBase {
     elevatorEncoder.setPosition((double) (getLaserCanReading()));
 
     //PID values are still being tuned, but these values do work
-    elevatorRightMotorConfig.closedLoop.p(0.05);
+    elevatorRightMotorConfig.closedLoop.p(0.005);
     elevatorRightMotorConfig.closedLoop.i(0);
     elevatorRightMotorConfig.closedLoop.d(0);
     /*
@@ -95,7 +95,7 @@ public class Elevator extends SubsystemBase {
      * Still don't know if we'll let it go full speed once everything
      * is figured out.
      */
-    elevatorRightMotorConfig.closedLoop.outputRange(-.1, .3);
+    elevatorRightMotorConfig.closedLoop.outputRange(-.1, .6);
     // elevatorRightMotorConfig.closedLoop.maxMotion.maxAcceleration(2);
     // elevatorRightMotorConfig.closedLoop.maxMotion.maxVelocity(10);
     // elevatorRightMotorConfig.closedLoop.maxMotion.allowedClosedLoopError(10);
