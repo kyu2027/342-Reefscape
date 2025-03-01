@@ -40,8 +40,8 @@ public class MoveElevatorWithJoystick extends Command {
      * is figured out.
      */
     double speed = -operator.getLeftY() / 3;
-    speed = MathUtil.clamp(speed, -.1, .3);
-    System.out.println("The joystick speed is inputting " + operator.getLeftY());
+    speed = MathUtil.clamp(speed, -.3, .6);
+    //System.out.println("The joystick speed is inputting " + operator.getLeftY());
 
     elevator.moveElevator(speed);
 
