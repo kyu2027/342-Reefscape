@@ -11,10 +11,10 @@ import frc.robot.commands.Elevator.MoveElevatorToPosition;
 import frc.robot.commands.Elevator.MoveElevatorWithJoystick;
 import frc.robot.commands.Wrist.WristToPosition;
 import frc.robot.commands.Wrist.WristWithJoystick;
-import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.*;
 
+import static frc.robot.Constants.ElevatorConstants.*;
 import static frc.robot.Constants.WristConstants.*;
 
 import edu.wpi.first.wpilibj.XboxController;
@@ -41,7 +41,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 
 /**
@@ -67,14 +66,12 @@ public class RobotContainer {
   private final WristToPosition wristToAlgae;
   private final WristToPosition wristToBarge;
 
-  private final MoveElevatorToPosition moveElevatorProcessor;
   private final MoveElevatorToPosition moveElevatorL1;
   private final MoveElevatorToPosition moveElevatorL2;
   private final MoveElevatorToPosition moveElevatorL3;
   private final MoveElevatorToPosition moveElevatorL4;
   private final MoveElevatorWithJoystick moveElevatorWithJoystick;
 
-  private final JoystickButton elevatorToProcessor;
   private final POVButton elevatorToL1;
   private final POVButton elevatorToL2;
   private final POVButton elevatorToL3;
@@ -155,12 +152,12 @@ public class RobotContainer {
     wristToAlgae = new WristToPosition(wrist, ALGAE_POSITION);
     wristToBarge = new WristToPosition(wrist, BARGE_POSITION);
 
-    // Creates commands telling the elevator to go to different coral branches
-    moveElevatorL1 = new MoveElevatorToPosition(elevator, ElevatorConstants.L1_HEIGHT);
-    moveElevatorL2 = new MoveElevatorToPosition(elevator, ElevatorConstants.L2_HEIGHT);
-    moveElevatorL3 = new MoveElevatorToPosition(elevator, ElevatorConstants.L3_HEIGHT);
-    moveElevatorL4 = new MoveElevatorToPosition(elevator, ElevatorConstants.L4_HEIGHT);
-    moveElevatorProcessor = new MoveElevatorToPosition(elevator, ElevatorConstants.PROCESSOR_HEIGHT);
+    //Creates commands telling the elevator to go to different coral branches
+    //L1 is the same height as the processor
+    moveElevatorL1 = new MoveElevatorToPosition(elevator, L1_HEIGHT);
+    moveElevatorL2 = new MoveElevatorToPosition(elevator, L2_HEIGHT);
+    moveElevatorL3 = new MoveElevatorToPosition(elevator, L3_HEIGHT);
+    moveElevatorL4 = new MoveElevatorToPosition(elevator, L4_HEIGHT);
 
     wristWithJoy = new WristWithJoystick(operator, wrist);
     moveElevatorWithJoystick = new MoveElevatorWithJoystick(elevator, operator);
@@ -177,7 +174,6 @@ public class RobotContainer {
     elevatorToL2 = new POVButton(operator, 90);
     elevatorToL3 = new POVButton(operator, 270);
     elevatorToL4 = new POVButton(operator, 0);
-    elevatorToProcessor = new JoystickButton(operator, XboxController.Button.kA.value);
 
     // stuff for claw?? down
     xButton = new JoystickButton(operator, XboxController.Button.kX.value);
@@ -190,6 +186,7 @@ public class RobotContainer {
     highFunnelButton = new JoystickButton(operator, XboxController.Button.kRightBumper.value);
 
     wrist.setDefaultCommand(wristToL2);
+    elevator.setDefaultCommand(moveElevatorWithJoystick);
 
     // Configure the trigger bindings
 
@@ -237,7 +234,6 @@ public class RobotContainer {
     elevatorToL2.onTrue(moveElevatorL2); // left button on d-pad
     elevatorToL3.onTrue(moveElevatorL3); // right button on d-pad
     elevatorToL4.onTrue(moveElevatorL4); // top button on d-pad
-    elevatorToProcessor.onTrue(moveElevatorProcessor); // the A button
 
     // Moves the wrist to a certain position based on what button is pressed
     l1Button.onTrue(wristToIntake);
