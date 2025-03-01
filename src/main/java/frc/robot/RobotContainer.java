@@ -7,28 +7,16 @@ package frc.robot;
 import frc.robot.commands.Autos;
 import frc.robot.commands.DriveWithJoystick;
 import frc.robot.commands.ExampleCommand;
-<<<<<<< HEAD
 import frc.robot.commands.Elevator.MoveElevatorToPosition;
 import frc.robot.commands.Elevator.MoveElevatorWithJoystick;
 import frc.robot.commands.Wrist.WristToPosition;
 import frc.robot.commands.Wrist.WristWithJoystick;
-import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.*;
 
+import static frc.robot.Constants.ElevatorConstants.*;
 import static frc.robot.Constants.WristConstants.*;
 
-=======
-import frc.robot.subsystems.ExampleSubsystem;
-import frc.robot.subsystems.Elevator;
-import frc.robot.commands.Elevator.MoveElevatorToPosition;
-import frc.robot.commands.Elevator.MoveElevatorWithJoystick;
-import static frc.robot.Constants.ElevatorConstants.*;
-
-import frc.robot.subsystems.*;
-
-import edu.wpi.first.wpilibj.Joystick;
->>>>>>> Elevator
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -67,7 +55,6 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 public class RobotContainer {
   private final XboxController operator;
 
-<<<<<<< HEAD
   private final Wrist wrist;
   private final Elevator elevator;
 
@@ -78,9 +65,6 @@ public class RobotContainer {
   private final WristToPosition wristToL4;
   private final WristToPosition wristToAlgae;
   private final WristToPosition wristToBarge;
-=======
-  private final Elevator elevator;
->>>>>>> Elevator
 
   private final MoveElevatorToPosition moveElevatorL1;
   private final MoveElevatorToPosition moveElevatorL2;
@@ -93,7 +77,6 @@ public class RobotContainer {
   private final POVButton elevatorToL3;
   private final POVButton elevatorToL4;
 
-<<<<<<< HEAD
   // private final SequentialCommandGroup goToIntake;
   // private final SequentialCommandGroup goToL1;
   // private final SequentialCommandGroup goToL2;
@@ -112,10 +95,6 @@ public class RobotContainer {
   private Command onStop;
   private Command outtakeButton;
   private Command intakeCommand;
-=======
-  private final CommandXboxController m_driverController;
-  private final ExampleSubsystem m_exampleSubsystem;
->>>>>>> Elevator
 
   private final JoystickButton lowFunnelButton;
   private final JoystickButton highFunnelButton;
@@ -148,7 +127,7 @@ public class RobotContainer {
 
     // Replace with CommandPS4Controller or CommandJoystick if needed
     m_driverController = new CommandXboxController(OperatorConstants.kDriverControllerPort);
-
+    wrist = new Wrist();
     elevator = new Elevator();
 
     claw = new Claw();
@@ -166,7 +145,6 @@ public class RobotContainer {
 
     operator = new XboxController(1);
 
-<<<<<<< HEAD
     // Creates commands telling the wrist to go to different coral branches
     wristToIntake = new WristToPosition(wrist, INTAKE_POSITION);
     wristToL2 = new WristToPosition(wrist, L2_POSITION);
@@ -174,24 +152,16 @@ public class RobotContainer {
     wristToAlgae = new WristToPosition(wrist, ALGAE_POSITION);
     wristToBarge = new WristToPosition(wrist, BARGE_POSITION);
 
-    // Creates commands telling the elevator to go to different coral branches
-    moveElevatorL1 = new MoveElevatorToPosition(elevator, ElevatorConstants.L1_HEIGHT);
-    moveElevatorL2 = new MoveElevatorToPosition(elevator, ElevatorConstants.L2_HEIGHT);
-    moveElevatorL3 = new MoveElevatorToPosition(elevator, ElevatorConstants.L3_HEIGHT);
-    moveElevatorL4 = new MoveElevatorToPosition(elevator, ElevatorConstants.L4_HEIGHT);
-    moveElevatorProcessor = new MoveElevatorToPosition(elevator, ElevatorConstants.PROCESSOR_HEIGHT);
-=======
     //Creates commands telling the elevator to go to different coral branches
     //L1 is the same height as the processor
     moveElevatorL1 = new MoveElevatorToPosition(elevator, L1_HEIGHT);
     moveElevatorL2 = new MoveElevatorToPosition(elevator, L2_HEIGHT);
     moveElevatorL3 = new MoveElevatorToPosition(elevator, L3_HEIGHT);
     moveElevatorL4 = new MoveElevatorToPosition(elevator, L4_HEIGHT);
->>>>>>> Elevator
 
+    wristWithJoy = new WristWithJoystick(operator, wrist);
     moveElevatorWithJoystick = new MoveElevatorWithJoystick(elevator, operator);
 
-<<<<<<< HEAD
     // Creating new buttons for L1, L2/L3, L4, and algae
     // Creating new buttons for L1, L2/L3, L4, and algae
     l1Button = new POVButton(operator, 90);
@@ -200,22 +170,15 @@ public class RobotContainer {
     algaeButton = new POVButton(operator, 180);
 
     // Operator buttons
-=======
-    //Operator buttons for elevator
->>>>>>> Elevator
     elevatorToL1 = new POVButton(operator, 180);
     elevatorToL2 = new POVButton(operator, 90);
     elevatorToL3 = new POVButton(operator, 270);
     elevatorToL4 = new POVButton(operator, 0);
 
-<<<<<<< HEAD
     // stuff for claw?? down
     xButton = new JoystickButton(operator, XboxController.Button.kX.value);
     aButton = new JoystickButton(operator, XboxController.Button.kA.value);
     yButton = new JoystickButton(operator, XboxController.Button.kY.value);
-=======
-    elevator.setDefaultCommand(moveElevatorWithJoystick);
->>>>>>> Elevator
 
     // Configure the trigger bindings
 
@@ -223,6 +186,7 @@ public class RobotContainer {
     highFunnelButton = new JoystickButton(operator, XboxController.Button.kRightBumper.value);
 
     wrist.setDefaultCommand(wristToL2);
+    elevator.setDefaultCommand(moveElevatorWithJoystick);
 
     // Configure the trigger bindings
 
@@ -249,7 +213,6 @@ public class RobotContainer {
 
     configureBindings();
 
-<<<<<<< HEAD
   }
 
   /**
@@ -271,32 +234,12 @@ public class RobotContainer {
     elevatorToL2.onTrue(moveElevatorL2); // left button on d-pad
     elevatorToL3.onTrue(moveElevatorL3); // right button on d-pad
     elevatorToL4.onTrue(moveElevatorL4); // top button on d-pad
-    elevatorToProcessor.onTrue(moveElevatorProcessor); // the A button
 
     // Moves the wrist to a certain position based on what button is pressed
     l1Button.onTrue(wristToIntake);
     l2Button.onTrue(wristToL2);
     l4Button.onTrue(wristToL4);
     algaeButton.onTrue(wristToAlgae);
-=======
-    SmartDashboard.putData(elevator);
-  }
-
-/**
- * Use this method to define your trigger->command mappings. Triggers can be created via the
- * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with an arbitrary
- * predicate, or via the named factories in {@link
- * edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for {@link
- * CommandXboxController Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller
- * PS4} controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
- * joysticks}.
- */
-  private void configureBindings() {
-  elevatorToL1.onTrue(moveElevatorL1); // down button on d-pad
-  elevatorToL2.onTrue(moveElevatorL2); // left button on d-pad
-  elevatorToL3.onTrue(moveElevatorL3); // right button on d-pad
-  elevatorToL4.onTrue(moveElevatorL4); // top button on d-pad
->>>>>>> Elevator
 
     // claw
     xButton.whileTrue(onStop);
@@ -308,7 +251,6 @@ public class RobotContainer {
 
   }
 
-<<<<<<< HEAD
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
@@ -319,16 +261,3 @@ public class RobotContainer {
     return autoChooser.getSelected();
   }
 }
-=======
-/**
- * Use this to pass the autonomous command to the main {@link Robot} class.
- *
- * @return the command to run in autonomous
- */
-  public Command getAutonomousCommand() {
-  // An example command will be run in autonomous
-  return Autos.exampleAuto(m_exampleSubsystem);
-  }
-}
-
->>>>>>> Elevator
