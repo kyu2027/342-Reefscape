@@ -89,7 +89,12 @@ public class Wrist extends SubsystemBase {
    * Moves wrist at a specified speed
    */
   public void move(double speed){
-    wrist.set(speed);
+    if(speed > 0.05) {
+      wrist.set(speed);
+      currentPosition = getPosition();
+    }else{
+      holdWristPosition();
+    }
   }
 
   /*
@@ -100,6 +105,10 @@ public class Wrist extends SubsystemBase {
     wristController.setReference(position, ControlType.kPosition);
   }
 
+  public void holdWristPosition() {
+    wristController.setReference(getPosition(), ControlType.kPosition);
+  }
+
   /*
    * Returns the throughbore encoder
    */
@@ -108,7 +117,7 @@ public class Wrist extends SubsystemBase {
   }
 
   /*
-   * returns the relative position of the wrist
+   * Returns the relative position of the wrist
    */
   public double getPosition() {
     return wristEncoder.getPosition();
@@ -125,13 +134,12 @@ public class Wrist extends SubsystemBase {
    * @return
    */
   public boolean isSafe(){
-    return (currentPosition >= 1.3);
+    return (getPosition() >= 1.3);
   }
 
   @Override
   public void periodic() {
     time = timer.get();
-    currentPosition = wristEncoder.getPosition();
     if(time >= 1.5 && !didReset)
       resetEncoder();
   }
