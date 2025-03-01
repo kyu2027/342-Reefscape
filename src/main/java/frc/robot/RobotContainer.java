@@ -66,6 +66,7 @@ public class RobotContainer {
     operator = new XboxController(1);
 
     //Creates commands telling the elevator to go to different coral branches
+    //L1 is the same height as the processor
     moveElevatorL1 = new MoveElevatorToPosition(elevator, L1_HEIGHT);
     moveElevatorL2 = new MoveElevatorToPosition(elevator, L2_HEIGHT);
     moveElevatorL3 = new MoveElevatorToPosition(elevator, L3_HEIGHT);

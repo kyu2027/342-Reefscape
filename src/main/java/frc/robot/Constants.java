@@ -30,6 +30,12 @@ public final class Constants {
     public static final double BOTTOM_POSITION = 0.0;
     public static final double TOP_POSITION = 1400.0;
 
+    /*
+     * Still tuning values for positions because
+     * encoder and laserCAN don't read the same measurement.
+     * The numbers on the left is what the encoder reads,
+     * the numbers on the right is what the laserCAN reads.
+     */
     public static final double L1_HEIGHT = 0.0;
     public static final double L2_HEIGHT = /**241.7*/ 300.0;
     public static final double L3_HEIGHT = /**624.58*/ 485.0;

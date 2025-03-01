@@ -86,9 +86,15 @@ public class Elevator extends SubsystemBase {
     elevatorEncoder = elevatorRightMotor.getEncoder();
     elevatorEncoder.setPosition((double) (getLaserCanReading()));
 
+    //PID values are still being tuned, but these values do work
     elevatorRightMotorConfig.closedLoop.p(0.05);
     elevatorRightMotorConfig.closedLoop.i(0);
     elevatorRightMotorConfig.closedLoop.d(0);
+    /*
+     * Elevator is slowed right now to prevent damages during testing.
+     * Still don't know if we'll let it go full speed once everything
+     * is figured out.
+     */
     elevatorRightMotorConfig.closedLoop.outputRange(-.1, .3);
     // elevatorRightMotorConfig.closedLoop.maxMotion.maxAcceleration(2);
     // elevatorRightMotorConfig.closedLoop.maxMotion.maxVelocity(10);
@@ -111,6 +117,7 @@ public class Elevator extends SubsystemBase {
     return elevatorLaserCan.getMeasurement().distance_mm;
   }
 
+  //Returns the reading of the relative encoder
   public double getEncoderPosition() {
     return elevatorEncoder.getPosition();
   }
@@ -121,6 +128,7 @@ public class Elevator extends SubsystemBase {
     return getLaserCanReading() == 0;
   }
 
+  //Moves the elevator to the given position
   public void ElevatorToPosition(double nextPosition) {
 
     goingDown = currentPosition > nextPosition;
@@ -157,17 +165,20 @@ public class Elevator extends SubsystemBase {
     elevatorRightMotor.stopMotor();
   }
 
+  //Sets the encoder position to the laserCAN position
   public void resetEncoder() {
     elevatorEncoder.setPosition((double) (getLaserCanReading()));
   }
 
+  //Holds the current position
   public void holdPosition() {
-    elevatorPID.setReference((double) (getLaserCanReading()), ControlType.kPosition);
+    elevatorPID.setReference(getEncoderPosition(), ControlType.kPosition);
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    //This constantly updates currentPosition so it stays updated
     currentPosition = getEncoderPosition();
   }
 
