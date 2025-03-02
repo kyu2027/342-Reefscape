@@ -140,9 +140,9 @@ public final class Constants {
 
     // Offsets
 
-    public static final double FRONT_LEFT_OFFSET = 0.85;
-    public static final double FRONT_RIGHT_OFFSET = 0.27;
-    public static final double BACK_LEFT_OFFSET = 2.07;
+    public static final double FRONT_LEFT_OFFSET = 0.84;
+    public static final double FRONT_RIGHT_OFFSET = 0.26;
+    public static final double BACK_LEFT_OFFSET = 3.08;
     public static final double BACK_RIGHT_OFFSET = 5.94;
 
 
