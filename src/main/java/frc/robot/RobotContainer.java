@@ -237,7 +237,7 @@ public class RobotContainer {
     lowFunnelButton = new JoystickButton(operator, XboxController.Button.kLeftBumper.value);
     highFunnelButton = new JoystickButton(operator, XboxController.Button.kRightBumper.value);
 
-    //wrist.setDefaultCommand(wristToAlgae);
+    wrist.setDefaultCommand(wristWithJoy);
     elevator.setDefaultCommand(moveElevatorWithJoystick);
 
     // Configure the trigger bindings
@@ -262,6 +262,7 @@ public class RobotContainer {
     SmartDashboard.putData(swerve);
     SmartDashboard.putData(claw);
     SmartDashboard.putData(autoChooser);
+    SmartDashboard.putData(elevator);
 
     configureBindings();
 
