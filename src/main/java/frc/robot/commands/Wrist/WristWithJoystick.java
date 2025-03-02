@@ -25,7 +25,10 @@ public class WristWithJoystick extends Command {
   private double speed;
 
   private boolean goingDown;
-
+  private boolean tooFarDown;
+  private boolean tooFarUp;
+  private boolean downFailCondition;
+  private boolean upFailCondition;
   /** Creates a new WristWithJoystick. */
   public WristWithJoystick(XboxController joy, Wrist wrist) {
     this.joy = joy;
@@ -43,14 +46,26 @@ public class WristWithJoystick extends Command {
   @Override
   public void execute() {
     currentPosition = wrist.getThroughBore().get();
-    speed = MathUtil.applyDeadband(0.15, joy.getRightY());
+    speed = MathUtil.applyDeadband(joy.getRightY(), 0.15);
 
-    goingDown = (speed < 0);
+    goingDown = (speed > 0);
 
-    if((goingDown && currentPosition <= LOW_WRIST_POS) || (!goingDown && currentPosition >= HIGH_WRIST_POS))
+    System.out.println(goingDown);
+    System.out.println("Current position: " + currentPosition);
+    tooFarDown = currentPosition >= LOW_WRIST_POS;
+    tooFarUp = currentPosition <= HIGH_WRIST_POS;
+    downFailCondition = goingDown && tooFarDown;
+    upFailCondition = !goingDown && tooFarUp;
+
+    System.out.println("speed: " + speed);
+    System.out.println("tooFarDown: " + tooFarDown + " tooFarUp: " + tooFarUp);
+    System.out.println("upFail: " + upFailCondition + " downFail: " + downFailCondition);
+    if((goingDown && tooFarDown) || (!goingDown && tooFarUp)) {
       wrist.move(0);
-    else 
+      System.out.println("Not Moving");
+    }else 
       //Divided by four to reduce speed
+      System.out.println("Moving");
       wrist.move(speed/WRIST_SPEED_LIMITER);
   }
 
