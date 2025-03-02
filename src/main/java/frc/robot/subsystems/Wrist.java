@@ -77,7 +77,7 @@ public class Wrist extends SubsystemBase {
     wristController = wrist.getClosedLoopController();
 
     wristConfig.closedLoop.p(WRIST_PID_VALUES[0]);
-    wristConfig.closedLoop.i(WRIST_PID_VALUES[1]);
+    // wristConfig.closedLoop.i(WRIST_PID_VALUES[1]);
     wristConfig.closedLoop.d(WRIST_PID_VALUES[2]);
     wristConfig.closedLoop.outputRange(-0.3, .3);
 
@@ -89,24 +89,25 @@ public class Wrist extends SubsystemBase {
    * Moves wrist at a specified speed
    */
   public void move(double speed){
-    if(speed > 0.05) {
+    if(Math.abs(speed) > 0.05) {
       wrist.set(speed);
-      currentPosition = getPosition();
     }else{
+      //wrist.set(0);
       holdWristPosition();
     }
+    currentPosition = getPosition();
   }
 
   /*
    * Moves wrist to a certain position
    */
   public void wristToPosition(double position){
-    this.desiredPosition = position;
+    currentPosition = position;
     wristController.setReference(position, ControlType.kPosition);
   }
 
   public void holdWristPosition() {
-    wristController.setReference(getPosition(), ControlType.kPosition);
+    wristController.setReference(currentPosition, ControlType.kPosition);
   }
 
   /*
@@ -154,7 +155,7 @@ public class Wrist extends SubsystemBase {
         builder.addDoubleProperty("ThroughBore", () -> throughBore.get(), null);
         builder.addDoubleProperty("Encoder", () -> wristEncoder.getPosition(), null);
         builder.addDoubleProperty("Speed", () -> wristEncoder.getVelocity(), null);
-        builder.addDoubleProperty("Desired Position", () -> desiredPosition, null);
+        builder.addDoubleProperty("Current Position", () -> currentPosition, null);
       // }
   }
 }
