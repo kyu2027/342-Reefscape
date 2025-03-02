@@ -50,8 +50,7 @@ public final class Constants {
     // Wrist position Values (absolute enocder values I think)
     public static final double LOW_WRIST_POS = 0.2751;
     public static final double HIGH_WRIST_POS = 0.518;
-
-    // Zeroes below are placeholders for the time being
+    
     // Because L2 and L3 have the same angles, only L2 will be used
     // All positions are in radians
     public static final double INTAKE_POSITION = 0.0;
@@ -69,7 +68,6 @@ public final class Constants {
   }
 
   public static class ElevatorConstants {
-    // placeholder values, change as soon as possible
 
     public static final int ELEVATORLEFT_ID = 9;
     public static final int ELEVATORRIGHT_ID = 10;
