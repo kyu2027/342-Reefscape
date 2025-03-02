@@ -36,8 +36,8 @@ public class Claw extends SubsystemBase {
   public Claw() {
 
     claw = new TalonFX(13);
-    forwardSensor = new DigitalInput(7);
-    backwardSensor = new DigitalInput(6);
+    forwardSensor = new DigitalInput(6);
+    backwardSensor = new DigitalInput(7);
 
   }
 
@@ -60,18 +60,18 @@ public class Claw extends SubsystemBase {
   }
 
   public void intakeCoral(){
-    if(forwardSensor.get() & backwardSensor.get()){
-      claw.set(-.5);
+    if(forwardSensor.get() && backwardSensor.get()){
+      claw.set(-.2);
 
       System.out.println("Neither back or front can see");
       
     }
-    else if(forwardSensor.get() & !backwardSensor.get()){
-      claw.set(-.05);
+    else if(forwardSensor.get() && !backwardSensor.get()){
+      claw.set(-.1);
 
         System.out.println("Front can't see, Back can see");
     }
-    else{
+    else if(!forwardSensor.get() && !backwardSensor.get()){
       claw.set(0);
 
       System.out.println("nothing should be spinning");

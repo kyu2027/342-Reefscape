@@ -6,6 +6,8 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static frc.robot.Constants.ElevatorConstants.*;
+import static frc.robot.Constants.WristConstants.THROUGHBORE_PORT;
+
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
@@ -19,6 +21,7 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkClosedLoopController;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import au.grapplerobotics.LaserCan;
+import au.grapplerobotics.interfaces.LaserCanInterface.Measurement;
 
 public class Elevator extends SubsystemBase {
 
@@ -84,10 +87,9 @@ public class Elevator extends SubsystemBase {
       .smartCurrentLimit(60);
   
     elevatorEncoder = elevatorRightMotor.getEncoder();
-    elevatorEncoder.setPosition((double) (getLaserCanReading()));
 
     //PID values are still being tuned, but these values do work
-    elevatorRightMotorConfig.closedLoop.p(0.05);
+    elevatorRightMotorConfig.closedLoop.p(0.005);
     elevatorRightMotorConfig.closedLoop.i(0);
     elevatorRightMotorConfig.closedLoop.d(0);
     /*
@@ -95,7 +97,7 @@ public class Elevator extends SubsystemBase {
      * Still don't know if we'll let it go full speed once everything
      * is figured out.
      */
-    elevatorRightMotorConfig.closedLoop.outputRange(-.1, .3);
+    elevatorRightMotorConfig.closedLoop.outputRange(-.3, .6);
     // elevatorRightMotorConfig.closedLoop.maxMotion.maxAcceleration(2);
     // elevatorRightMotorConfig.closedLoop.maxMotion.maxVelocity(10);
     // elevatorRightMotorConfig.closedLoop.maxMotion.allowedClosedLoopError(10);
@@ -108,13 +110,20 @@ public class Elevator extends SubsystemBase {
 
     tooLow = elevatorEncoder.getPosition() < BOTTOM_POSITION;
     tooHigh = elevatorEncoder.getPosition() > TOP_POSITION;
+    elevatorEncoder.setPosition(getLaserCanReading());
     currentPosition = elevatorEncoder.getPosition();
 
   }
 
   //Returns the reading of the laserCAN in millimeters
   public int getLaserCanReading() {
-    return elevatorLaserCan.getMeasurement().distance_mm;
+    Measurement measurement = elevatorLaserCan.getMeasurement();
+    if(measurement != null) {
+      return measurement.distance_mm;
+    }else{
+      return 0;
+    }
+    //return elevatorLaserCan.getMeasurement().distance_mm;
   }
 
   //Returns the reading of the relative encoder
@@ -122,42 +131,35 @@ public class Elevator extends SubsystemBase {
     return elevatorEncoder.getPosition();
   }
 
-  //Returns true if an object is _ millimeters to the bottom of the elevator;
-  public boolean objectTooClose() {
-    //Placeholder values, change after figuring out how close the elevator is to the ground
-    return getLaserCanReading() == 0;
-  }
+  /*
+   * The method below has been commented out because it is unlikely to be used
+   */
+  // //Returns true if an object is _ millimeters to the bottom of the elevator;
+  // public boolean objectTooClose() {
+  //   //Placeholder values, change after figuring out how close the elevator is to the ground
+  //   return getLaserCanReading() == 0;
+  // }
 
   //Moves the elevator to the given position
   public void ElevatorToPosition(double nextPosition) {
 
     goingDown = currentPosition > nextPosition;
 
-    // /*Better algorithm:
-    //  *    - check going down
-    //  *    - if(can move)
-    //  *    -    currentPosition = nextPosition
-    //  *    
-    //  *    setReference(currentPosition)
-    //  * 
-    //  */
-
-    elevatorPID.setReference(nextPosition, ControlType.kPosition);
-
-    //if((goingDown && tooLow) || (!goingDown && tooHigh)) {}
-
-    //   //From Mr. Neal:  This seems to be the problem
-    //   //Let's update current position here with curr = encoder.get
-    //   holdPosition();
-
-
-    //   System.out.println("Too low/high");
+    if(goingDown && tooLow || !goingDown && tooHigh)
+      stop();
+    else
+      elevatorPID.setReference(nextPosition, ControlType.kPosition);
 
   }
 
   //This method will set the elevator motors to the inputted value
   public void moveElevator(double speed) {
-    elevatorRightMotor.set(speed);
+    if(speed > 0.05) {
+      elevatorRightMotor.set(speed);
+      currentPosition = getEncoderPosition();
+    }else{
+      holdPosition();
+    }
   }
 
   //This method completely stops spinning the elevator motors
@@ -178,8 +180,6 @@ public class Elevator extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    //This constantly updates currentPosition so it stays updated
-    currentPosition = getEncoderPosition();
   }
 
   @Override
@@ -188,6 +188,7 @@ public class Elevator extends SubsystemBase {
 
     builder.setSmartDashboardType("Elevator");
 
+    //Data being put on Elastic for debugging purposes
     builder.addDoubleProperty("LaserCAN Reading", () -> getLaserCanReading(), null);
     builder.addDoubleProperty("Relative Encoder Reading", () -> getEncoderPosition(), null);
     builder.addDoubleProperty("Elevator Error", () -> ((double) (getLaserCanReading())) - getEncoderPosition(), null);

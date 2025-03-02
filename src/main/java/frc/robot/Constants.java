@@ -50,15 +50,14 @@ public final class Constants {
     // Wrist position Values (absolute enocder values I think)
     public static final double LOW_WRIST_POS = 0.2751;
     public static final double HIGH_WRIST_POS = 0.518;
-
-    // Zeroes below are placeholders for the time being
+    
     // Because L2 and L3 have the same angles, only L2 will be used
     // All positions are in radians
     public static final double INTAKE_POSITION = 0.0;
     public static final double L1_POSITION = 0.0;
-    public static final double L2_POSITION = 0.39;
+    public static final double L2_POSITION = 0.441;
     public static final double L4_POSITION = 1.049;
-    public static final double ALGAE_POSITION = 3.15;
+    public static final double ALGAE_POSITION = 2.504;
     public static final double BARGE_POSITION = 0.92;
 
     public static final double WRIST_SAFE_ERROR = Math.toRadians(5);
@@ -69,7 +68,6 @@ public final class Constants {
   }
 
   public static class ElevatorConstants {
-    // placeholder values, change as soon as possible
 
     public static final int ELEVATORLEFT_ID = 9;
     public static final int ELEVATORRIGHT_ID = 10;
@@ -79,6 +77,7 @@ public final class Constants {
 
     public static final double BOTTOM_POSITION = 0.0;
     public static final double TOP_POSITION = 1400.0;
+    public static final double ELEVATOR_ERROR = 10.0;
 
     /*
      * Still tuning values for positions because
@@ -88,8 +87,8 @@ public final class Constants {
      */
     public static final double L1_HEIGHT = 0.0;
     public static final double L2_HEIGHT = 241.7 /**300.0*/;
-    public static final double L3_HEIGHT = 624.58 /**485.0*/;
-    public static final double L4_HEIGHT = 1360.0 /**850.0*/;
+    public static final double L3_HEIGHT = 644.58 /**485.0*/;
+    public static final double L4_HEIGHT = 1400.0 /**850.0*/;
     public static final double PROCESSOR_HEIGHT = 0.0;
   }
 
@@ -141,9 +140,9 @@ public final class Constants {
 
     // Offsets
 
-    public static final double FRONT_LEFT_OFFSET = 0.85;
-    public static final double FRONT_RIGHT_OFFSET = 0.27;
-    public static final double BACK_LEFT_OFFSET = 2.07;
+    public static final double FRONT_LEFT_OFFSET = 0.84;
+    public static final double FRONT_RIGHT_OFFSET = 0.26;
+    public static final double BACK_LEFT_OFFSET = 3.08;
     public static final double BACK_RIGHT_OFFSET = 5.94;
 
 
