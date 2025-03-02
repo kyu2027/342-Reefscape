@@ -6,6 +6,8 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static frc.robot.Constants.ElevatorConstants.*;
+import static frc.robot.Constants.WristConstants.THROUGHBORE_PORT;
+
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
@@ -129,36 +131,24 @@ public class Elevator extends SubsystemBase {
     return elevatorEncoder.getPosition();
   }
 
-  //Returns true if an object is _ millimeters to the bottom of the elevator;
-  public boolean objectTooClose() {
-    //Placeholder values, change after figuring out how close the elevator is to the ground
-    return getLaserCanReading() == 0;
-  }
+  /*
+   * The method below has been commented out because it is unlikely to be used
+   */
+  // //Returns true if an object is _ millimeters to the bottom of the elevator;
+  // public boolean objectTooClose() {
+  //   //Placeholder values, change after figuring out how close the elevator is to the ground
+  //   return getLaserCanReading() == 0;
+  // }
 
   //Moves the elevator to the given position
   public void ElevatorToPosition(double nextPosition) {
 
     goingDown = currentPosition > nextPosition;
 
-    // /*Better algorithm:
-    //  *    - check going down
-    //  *    - if(can move)
-    //  *    -    currentPosition = nextPosition
-    //  *    
-    //  *    setReference(currentPosition)
-    //  * 
-    //  */
-
-    elevatorPID.setReference(nextPosition, ControlType.kPosition);
-
-    //if((goingDown && tooLow) || (!goingDown && tooHigh)) {}
-
-    //   //From Mr. Neal:  This seems to be the problem
-    //   //Let's update current position here with curr = encoder.get
-    //   holdPosition();
-
-
-    //   System.out.println("Too low/high");
+    if(goingDown && tooLow || !goingDown && tooHigh)
+      stop();
+    else
+      elevatorPID.setReference(nextPosition, ControlType.kPosition);
 
   }
 
@@ -190,7 +180,6 @@ public class Elevator extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    //This constantly updates currentPosition so it stays updated
   }
 
   @Override
@@ -199,6 +188,7 @@ public class Elevator extends SubsystemBase {
 
     builder.setSmartDashboardType("Elevator");
 
+    //Data being put on Elastic for debugging purposes
     builder.addDoubleProperty("LaserCAN Reading", () -> getLaserCanReading(), null);
     builder.addDoubleProperty("Relative Encoder Reading", () -> getEncoderPosition(), null);
     builder.addDoubleProperty("Elevator Error", () -> ((double) (getLaserCanReading())) - getEncoderPosition(), null);
