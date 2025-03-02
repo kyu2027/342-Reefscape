@@ -38,7 +38,7 @@ public final class Constants {
     public static final int THROUGHBORE_PORT = 8;
 
     public static final double WRIST_GEAR_RATIO = 1 / 45.0;
-    public static final double WRIST_SPEED_LIMITER = 4.0;
+    public static final double WRIST_SPEED_LIMITER = 2.0;
     public static final double WRIST_POSITION_CONVERSION = (WRIST_GEAR_RATIO) * (2 * Math.PI);
     public static final int WRIST_CURRENT_LIMIT = 30;
     public static final double WRIST_ZERO = 0.336;
@@ -48,7 +48,7 @@ public final class Constants {
     public static final double WRIST_ERROR = 0.1;
 
     // Wrist position Values (absolute enocder values I think)
-    public static final double LOW_WRIST_POS = 0.2751;
+    public static final double LOW_WRIST_POS = 2.751 /**0.2751*/;
     public static final double HIGH_WRIST_POS = 0.518;
     
     // Because L2 and L3 have the same angles, only L2 will be used
