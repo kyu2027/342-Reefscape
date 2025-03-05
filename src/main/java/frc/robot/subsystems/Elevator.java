@@ -108,8 +108,7 @@ public class Elevator extends SubsystemBase {
 
     elevatorRightMotor.configure(elevatorRightMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-    tooLow = elevatorEncoder.getPosition() < BOTTOM_POSITION;
-    tooHigh = elevatorEncoder.getPosition() > TOP_POSITION;
+
     elevatorEncoder.setPosition(getLaserCanReading());
     currentPosition = elevatorEncoder.getPosition();
 
@@ -144,17 +143,20 @@ public class Elevator extends SubsystemBase {
   public void ElevatorToPosition(double nextPosition) {
 
     goingDown = currentPosition > nextPosition;
+    tooLow = elevatorEncoder.getPosition() < BOTTOM_POSITION;
+    tooHigh = elevatorEncoder.getPosition() > TOP_POSITION;
 
     if(goingDown && tooLow || !goingDown && tooHigh)
       stop();
-    else
+    else {
       elevatorPID.setReference(nextPosition, ControlType.kPosition);
+      currentPosition = nextPosition;}
 
   }
 
   //This method will set the elevator motors to the inputted value
   public void moveElevator(double speed) {
-    if(speed > 0.05) {
+    if(Math.abs(speed) > 0.05) {
       elevatorRightMotor.set(speed);
       currentPosition = getEncoderPosition();
     }else{
@@ -174,7 +176,7 @@ public class Elevator extends SubsystemBase {
 
   //Holds the current position
   public void holdPosition() {
-    elevatorPID.setReference(getEncoderPosition(), ControlType.kPosition);
+    elevatorPID.setReference(currentPosition, ControlType.kPosition);
   }
 
   @Override
