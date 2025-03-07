@@ -4,10 +4,10 @@
 
 package frc.robot;
 
-import frc.robot.commands.Autos;
 import frc.robot.commands.DriveWithJoystick;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.commands.SpinClaw;
+import frc.robot.commands.Auto.Autos;
 import frc.robot.commands.Claw.Intake;
 import frc.robot.commands.Claw.Outtake;
 import frc.robot.commands.Elevator.MoveElevatorToPosition;
@@ -139,7 +139,7 @@ public class RobotContainer {
 
     // Creating sequential command groups that use wrist and elevator
     goToIntake = new SequentialCommandGroup(
-      new WristToPosition(wrist, WristPositions.ALGAE_WRIST_POSITION),
+      new WristToPosition(wrist, WristPositions.TOGGLE_POSITION),
       new MoveElevatorToPosition(elevator, wrist, ElevatorHeights.LOW_POSITION_L1),
       new ParallelCommandGroup(
       new MoveElevatorToPosition(elevator, wrist, ElevatorHeights.LOW_POSITION_L1, true), 
@@ -148,16 +148,16 @@ public class RobotContainer {
     );
 
     goToL2 = new SequentialCommandGroup(
-      new WristToPosition(wrist, WristPositions.ALGAE_WRIST_POSITION),
+      new WristToPosition(wrist, WristPositions.TOGGLE_POSITION),
       new MoveElevatorToPosition(elevator, wrist, ElevatorHeights.LOW_MIDDLE_POSITION_L2), 
       new ParallelCommandGroup(
         new MoveElevatorToPosition(elevator, wrist, ElevatorHeights.LOW_MIDDLE_POSITION_L2, true), 
-        new WristToPosition(wrist, WristPositions.LOW_WRIST_POSITION)
+        new WristToPosition(wrist, WristPositions.MIDDLE_WRIST_POSITION)
       )
     );
 
     goToL3 = new SequentialCommandGroup(
-      new WristToPosition(wrist, WristPositions.ALGAE_WRIST_POSITION),
+      new WristToPosition(wrist, WristPositions.TOGGLE_POSITION),
       new MoveElevatorToPosition(elevator, wrist, ElevatorHeights.HIGH_MIDDLE_POSITION_L3), 
       new ParallelCommandGroup(
         new MoveElevatorToPosition(elevator, wrist, ElevatorHeights.HIGH_MIDDLE_POSITION_L3, true), 
@@ -166,7 +166,7 @@ public class RobotContainer {
     );
 
     goToL4 = new SequentialCommandGroup(
-      new WristToPosition(wrist, WristPositions.ALGAE_WRIST_POSITION),
+      new WristToPosition(wrist, WristPositions.TOGGLE_POSITION),
       new MoveElevatorToPosition(elevator, wrist, ElevatorHeights.HIGH_POSITION_L4),
       new ParallelCommandGroup(
         new MoveElevatorToPosition(elevator, wrist, ElevatorHeights.HIGH_POSITION_L4, true), 
@@ -175,7 +175,7 @@ public class RobotContainer {
     );
 
     goToProcessor = new SequentialCommandGroup(
-      new WristToPosition(wrist, WristPositions.ALGAE_WRIST_POSITION),
+      new WristToPosition(wrist, WristPositions.TOGGLE_POSITION),
       new MoveElevatorToPosition(elevator, wrist, ElevatorHeights.PROCESSOR_POSITION),
       new ParallelCommandGroup(
         new MoveElevatorToPosition(elevator, wrist, ElevatorHeights.PROCESSOR_POSITION, true), 
@@ -204,6 +204,7 @@ public class RobotContainer {
     // Autos
     autoChooser = new SendableChooser<>();
     autoChooser.addOption("PathPlannerTest", new PathPlannerAuto("New Auto"));
+    autoChooser.addOption("Drive Foward", Autos.driveFoward(swerve));
 
     // Smartdashboard Data 
     SmartDashboard.putData(wrist);

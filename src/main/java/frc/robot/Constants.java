@@ -58,6 +58,7 @@ public final class Constants {
     public static final double L2_POSITION = 0.59; //  0.39
     public static final double L4_POSITION = 1.249; // 1.049
     public static final double SAFE_POSITION = 1.769; // 1.569
+    public static final double MOVE_VALUE = 1.869; // 1.569
     public static final double ALGAE_POSITION = 2.704; // 2.504
     public static final double BARGE_POSITION = 1.12; //  0.92  
 
@@ -69,9 +70,10 @@ public final class Constants {
 
     public enum WristPositions { 
       TOGGLE_POSITION(SAFE_POSITION, ALGAE_POSITION),
+      MOVE_POSITION(MOVE_VALUE,ALGAE_POSITION),
       LOW_WRIST_POSITION(INTAKE_POSITION,ALGAE_POSITION),
-      MIDDLE_WRIST_POSITION(L2_POSITION,BARGE_POSITION),
-      HIGH_WRIST_POSITION(L4_POSITION,ALGAE_POSITION),
+      MIDDLE_WRIST_POSITION(L2_POSITION,ALGAE_POSITION), //CHANGE MADE
+      HIGH_WRIST_POSITION(L4_POSITION,BARGE_POSITION), //CHANGE MADE
       PROCESSOR_WRIST_POSITION(INTAKE_POSITION,ALGAE_POSITION),
       ALGAE_WRIST_POSITION(ALGAE_POSITION,ALGAE_POSITION);
 

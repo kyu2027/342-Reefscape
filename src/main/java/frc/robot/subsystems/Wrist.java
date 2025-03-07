@@ -54,6 +54,7 @@ public class Wrist extends SubsystemBase {
     // Wrist instantiatiion
     wrist = new SparkMax(WRIST_ID, MotorType.kBrushless);
     wristConfig = new SparkMaxConfig();
+    coralMode = true;
     goingDown = false;
     didReset = false;
 
@@ -61,7 +62,7 @@ public class Wrist extends SubsystemBase {
 
     //Encoder instantiation
     throughBore = new DutyCycleEncoder(THROUGHBORE_PORT, (2 * Math.PI), WRIST_ZERO);
-    currentPosition = throughBore.get();
+    currentPosition = INTAKE_POSITION;
       
     //Wrist idle mode & smart current limit
     wristConfig
