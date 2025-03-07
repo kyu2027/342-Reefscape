@@ -8,6 +8,7 @@ import frc.robot.commands.DriveWithJoystick;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.commands.SpinClaw;
 import frc.robot.commands.Auto.Autos;
+import frc.robot.commands.Auto.RotateToAngle;
 import frc.robot.commands.Claw.Intake;
 import frc.robot.commands.Claw.Outtake;
 import frc.robot.commands.Elevator.MoveElevatorToPosition;
@@ -79,9 +80,13 @@ public class RobotContainer {
   private WristWithJoystick wristWithJoy;
   private DriveWithJoystick driveWithJoystick;
   private Command fieldOrienatedCommand;
+  private RotateToAngle rotateToAngle;
 
   private Command toggleCoralMode;
   private Command toggleAlgaeMode;
+
+  private Command reverseCoralIntake;
+  private Command slowOuttake;
 
   private SendableChooser<Command> autoChooser;
 
@@ -107,6 +112,11 @@ public class RobotContainer {
   private POVButton toggleCoralModeButton;
   private POVButton toggleAlgaeModeButton;
 
+  private JoystickButton rotate90Button;
+
+  private JoystickButton reverseCoralButton;
+  private JoystickButton slowOuttakeButton;
+
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
@@ -122,10 +132,14 @@ public class RobotContainer {
     claw = new Claw();
     swerve = new SwerveDrive();
 
-
     // Commands 
     wristWithJoy = new WristWithJoystick(operator, wrist);
-    moveElevatorWithJoystick = new MoveElevatorWithJoystick(elevator, operator);
+    moveElevatorWithJoystick = new MoveElevatorWithJoystick(elevator,wrist, operator);
+    rotateToAngle = new RotateToAngle(180, swerve);
+
+    reverseCoralIntake = Commands.runOnce(() -> {claw.reverseCoralIntake();});
+    slowOuttake = Commands.runOnce(() -> {claw.slowOutakeCoral();});
+
 
     intake = new Intake(claw, wrist);
     outtake = new Outtake(wrist, claw);
@@ -201,12 +215,17 @@ public class RobotContainer {
     wristOverrideButton = new JoystickButton(operator, XboxController.Button.kStart.value);
     elevatorOverrideButton = new JoystickButton(operator, XboxController.Button.kBack.value);
 
+    rotate90Button = new JoystickButton(driver, XboxController.Button.kA.value);
+
+    slowOuttakeButton = new JoystickButton(operator, XboxController.Button.kRightStick.value);
+    reverseCoralButton = new JoystickButton(operator, XboxController.Button.kLeftStick.value);
+
     // Autos
     autoChooser = new SendableChooser<>();
     //autoChooser.addOption("PathPlannerTest", new PathPlannerAuto("New Auto"));
     autoChooser.addOption("Drive Foward", Autos.driveFoward(swerve));
     autoChooser.addOption("Score Middle", Autos.scoreMiddle(swerve,wrist,claw));
-    autoChooser.addOption("Do Nothing", Autos.doNothing());
+    autoChooser.addOption("Do Nothing", Autos.doNothing(swerve));
 
     // Smartdashboard Data 
     SmartDashboard.putData(wrist);
@@ -252,6 +271,11 @@ public class RobotContainer {
     // claw
     intakeButton.whileTrue(intake);
     outtakeButton.whileTrue(outtake);
+    slowOuttakeButton.whileTrue(slowOuttake);
+    reverseCoralButton.whileTrue(reverseCoralIntake);
+
+    rotate90Button.onTrue(rotateToAngle);
+    
 
     elevatorOverrideButton.onTrue(moveElevatorWithJoystick);
     wristOverrideButton.onTrue(wristWithJoy);

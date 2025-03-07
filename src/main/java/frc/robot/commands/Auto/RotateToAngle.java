@@ -33,11 +33,11 @@ public class RotateToAngle extends Command {
     addRequirements(swerve);
 
     rotateController = new PIDController(
-      0,0,0
+      .035,.0,0
       );
 
       rotateController.reset();
-      rotateController.setTolerance(angle);
+      rotateController.setTolerance(2);
 
     // Use addRequirements() here to declare subsystem dependencies.
   }

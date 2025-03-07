@@ -18,19 +18,23 @@ public final class Autos {
   /** Example static factory for an autonomous command. */
 
   public static Command driveFoward(SwerveDrive swerve) {
-    return Commands.sequence(new TimedDrive(swerve,.5, -DriveConstants.MAX_DRIVE_SPEED / 2,0, 0)); // CHANGE MADE
+    return Commands.sequence(new TimedDrive(swerve,.5, DriveConstants.MAX_DRIVE_SPEED / 2,0, 0)); // CHANGE MADE
   }
   
-  public static Command doNothing(){
-    return Commands.run(null);
+  public static Command doNothing(SwerveDrive swerve){
+    return Commands.sequence(new TimedDrive(swerve, 0, 0, 0, 0));
   }
 
   public static Command scoreMiddle(SwerveDrive swerve, Wrist wrist, Claw claw){
     return Commands.sequence(
       
-    new TimedDrive(swerve, .5, -DriveConstants.MAX_DRIVE_SPEED / 2, 0, 0),
+    //new RotateToAngle(180, swerve),
+    
+    new TimedDrive(swerve,1.2, -DriveConstants.MAX_DRIVE_SPEED / 4, 0, 0),    
 
-    new Outtake(wrist, claw));
+    Commands.runOnce(() -> {claw.slowOutakeCoral();})
+
+    );
 
   } 
 
