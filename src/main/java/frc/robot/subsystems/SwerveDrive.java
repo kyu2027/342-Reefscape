@@ -229,6 +229,10 @@ public class SwerveDrive extends SubsystemBase {
     public void resetOdometry(Pose2d pose){
        odometry.resetPosition(NavX.getRotation2d(), getCurrentSwerveModulePositions(), pose);
     }
+    
+    public AHRS getGyro(){
+      return NavX;
+    }
 
     public void configureAutoBuilder() {
       AutoBuilder.configure(
