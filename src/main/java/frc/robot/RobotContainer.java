@@ -203,8 +203,10 @@ public class RobotContainer {
 
     // Autos
     autoChooser = new SendableChooser<>();
-    autoChooser.addOption("PathPlannerTest", new PathPlannerAuto("New Auto"));
+    //autoChooser.addOption("PathPlannerTest", new PathPlannerAuto("New Auto"));
     autoChooser.addOption("Drive Foward", Autos.driveFoward(swerve));
+    autoChooser.addOption("Score Middle", Autos.scoreMiddle(swerve,wrist,claw));
+    autoChooser.addOption("Do Nothing", Autos.doNothing());
 
     // Smartdashboard Data 
     SmartDashboard.putData(wrist);
