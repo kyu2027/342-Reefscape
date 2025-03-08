@@ -28,11 +28,11 @@ public final class Autos {
   public static Command scoreMiddle(SwerveDrive swerve, Wrist wrist, Claw claw){
     return Commands.sequence(
       
-    //new RotateToAngle(180, swerve),
+    new RotateToAngle(180, swerve),
     
     new TimedDrive(swerve,1.2, -DriveConstants.MAX_DRIVE_SPEED / 4, 0, 0),    
 
-    Commands.runOnce(() -> {claw.slowOutakeCoral();})
+    Commands.runOnce(() -> {claw.slowOutakeCoral();}).withTimeout(2)
 
     );
 
