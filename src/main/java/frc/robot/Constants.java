@@ -136,7 +136,7 @@ public final class Constants {
     public static final double L1_HEIGHT = 0.0;
     public static final double L2_HEIGHT = 241.7 /**300.0*/;
     public static final double L3_HEIGHT = 644.58 /**485.0*/;
-    public static final double L4_HEIGHT = 1400.0 /**850.0*/;
+    public static final double L4_HEIGHT = 1384.0 /**850.0*/;
     public static final double PROCESSOR_HEIGHT = 0.0;
 
     public static final double ALGAE_LOW_HEIGHT = 462.36;
@@ -207,7 +207,7 @@ public final class Constants {
 
     // Speeds
     public static double MAX_DRIVE_SPEED = Units.feetToMeters(6);
-    public static double SLOW_DRIVE_SPEED = Units.feetToMeters(5);
+    public static double SLOW_DRIVE_SPEED = Units.feetToMeters(2);
 
     public static double MAX_ROTATE_SPEED = 4 * Math.PI;
 

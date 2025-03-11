@@ -128,7 +128,6 @@ public class Wrist extends SubsystemBase {
   /**resets relative encoder to equal the through bore value*/
   public void resetEncoder(){
     wristEncoder.setPosition(throughBore.get());
-    didReset = true;
   }
 
   /**
@@ -165,6 +164,7 @@ public class Wrist extends SubsystemBase {
     time = timer.get();
     if(time >= 1.5 && !didReset)
       resetEncoder();
+      didReset = true;
   }
 
   @Override

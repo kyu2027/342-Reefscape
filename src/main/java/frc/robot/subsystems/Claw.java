@@ -84,6 +84,10 @@ public class Claw extends SubsystemBase {
     claw.set(-.15);
   }
 
+  public void spin(double speed){
+    claw.set(speed);
+  }
+
  // public double getLastPos(){
   //    return currPos;
   //  }

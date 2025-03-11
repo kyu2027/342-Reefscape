@@ -26,6 +26,7 @@ import java.io.Writer;
 import java.security.AlgorithmConstraints;
 
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.PS4Controller.Button;
 import edu.wpi.first.wpilibj.XboxController.Axis;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -80,6 +81,7 @@ public class RobotContainer {
   private WristWithJoystick wristWithJoy;
   private DriveWithJoystick driveWithJoystick;
   private Command fieldOrienatedCommand;
+  private Command slowModeToggle;
   private RotateToAngle rotateToAngle;
 
   private Command toggleCoralMode;
@@ -87,6 +89,8 @@ public class RobotContainer {
 
   private Command reverseCoralIntake;
   private Command slowOuttake;
+
+  private Command resetEncoder;
 
   private SendableChooser<Command> autoChooser;
 
@@ -105,12 +109,15 @@ public class RobotContainer {
   private JoystickButton level4Button;
 
   private JoystickButton fieldOrienatedButton;
+  private JoystickButton slowModeButton;
 
   private JoystickButton elevatorOverrideButton;
   private JoystickButton wristOverrideButton;
 
   private POVButton toggleCoralModeButton;
   private POVButton toggleAlgaeModeButton;
+
+  private POVButton resetEncoderButton;
 
   private JoystickButton rotate90Button;
 
@@ -137,9 +144,11 @@ public class RobotContainer {
     moveElevatorWithJoystick = new MoveElevatorWithJoystick(elevator,wrist, operator);
     rotateToAngle = new RotateToAngle(180, swerve);
 
-    reverseCoralIntake = Commands.runOnce(() -> {claw.reverseCoralIntake();});
+    reverseCoralIntake = Commands.startEnd(() -> {claw.spin(.1);}, () -> {claw.spin(0);}, claw);
+    
     slowOuttake = Commands.runOnce(() -> {claw.slowOutakeCoral();});
 
+    resetEncoder = Commands.runOnce(() -> {wrist.resetEncoder();});
 
     intake = new Intake(claw, wrist);
     outtake = new Outtake(wrist, claw);
@@ -151,6 +160,8 @@ public class RobotContainer {
         swerve.toggleFieldOriented();
       }, swerve);
 
+    slowModeToggle = Commands.runOnce(() -> {swerve.toggleSlowMode();}, swerve);
+ 
     // Creating sequential command groups that use wrist and elevator
     goToIntake = new SequentialCommandGroup(
       new WristToPosition(wrist, WristPositions.TOGGLE_POSITION),
@@ -209,7 +220,10 @@ public class RobotContainer {
     toggleAlgaeModeButton = new POVButton(operator, 0);
     toggleCoralModeButton = new POVButton(operator, 180);
 
+    resetEncoderButton = new POVButton(operator, 270);
+
     fieldOrienatedButton = new JoystickButton(driver, XboxController.Button.kY.value);
+    slowModeButton = new JoystickButton(driver, XboxController.Button.kLeftBumper.value);
     driveWithJoystick = new DriveWithJoystick(swerve, driver);
 
     wristOverrideButton = new JoystickButton(operator, XboxController.Button.kStart.value);
@@ -262,6 +276,8 @@ public class RobotContainer {
     toggleAlgaeModeButton.onTrue(toggleAlgaeMode);
     toggleCoralModeButton.onTrue(toggleCoralMode);
 
+    resetEncoderButton.onTrue(resetEncoder);
+
     // Moves the wrist to a certain position based on what button is pressed
     level1Button.onTrue(goToIntake); 
     level2Button.onTrue(goToL2);
@@ -284,6 +300,7 @@ public class RobotContainer {
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
 
     fieldOrienatedButton.whileTrue(fieldOrienatedCommand);
+    slowModeButton.whileTrue(slowModeToggle);
 
   }
 
