@@ -53,6 +53,15 @@ public class DriveWithJoystick extends Command {
    ySpeed = MathUtil.applyDeadband(ySpeed, 0.15);
    rotateSpeed = MathUtil.applyDeadband(rotateSpeed, 0.15);
 
+   
+   if (swerve.getSlowMode()){
+    xSpeed = xSpeed * DriveConstants.SLOW_DRIVE_SPEED;
+    ySpeed = ySpeed * DriveConstants.SLOW_DRIVE_SPEED;
+   } else {
+   xSpeed = xSpeed * DriveConstants.MAX_DRIVE_SPEED;
+   ySpeed = ySpeed * DriveConstants.MAX_DRIVE_SPEED;
+  }
+
    /* Puts the x,y, and rotates speeds into a new ChasisSpeeds */
    chassisSpeeds = new ChassisSpeeds(xSpeed, ySpeed, rotateSpeed);
 

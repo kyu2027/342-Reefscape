@@ -42,7 +42,7 @@ public class Claw extends SubsystemBase {
   }
 
   public void outTakeAlgae(){
-    claw.set(.5);
+    claw.set(-.5);
   }
 
   public void stopButton(){
@@ -50,25 +50,22 @@ public class Claw extends SubsystemBase {
   }
 
   public void intakeAlgae(){
-    claw.set(-.5);
+    claw.set(.5);
   }
 
   public void outTakeCoral(){
-      
     claw.set(-.5);
       
   }
 
   public void intakeCoral(){
     if(forwardSensor.get() && backwardSensor.get()){
-      claw.set(-.2);
-
+      claw.set(-.35);
       System.out.println("Neither back or front can see");
       
     }
     else if(forwardSensor.get() && !backwardSensor.get()){
-      claw.set(-.1);
-
+      claw.set(-.05);
         System.out.println("Front can't see, Back can see");
     }
     else if(!forwardSensor.get() && !backwardSensor.get()){
@@ -77,6 +74,18 @@ public class Claw extends SubsystemBase {
       System.out.println("nothing should be spinning");
     }
 
+  }
+
+  public void reverseCoralIntake(){
+    claw.set(.2);
+  }
+
+  public void slowOutakeCoral(){
+    claw.set(-.15);
+  }
+
+  public void spin(double speed){
+    claw.set(speed);
   }
 
  // public double getLastPos(){

@@ -45,28 +45,20 @@ public class WristWithJoystick extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    
     currentPosition = wrist.getThroughBore().get();
     speed = MathUtil.applyDeadband(joy.getRightY(), 0.15);
 
     goingDown = (speed > 0);
 
-    System.out.println(goingDown);
-    System.out.println("Current position: " + currentPosition);
-    tooFarDown = currentPosition >= LOW_WRIST_POS;
-    tooFarUp = currentPosition <= HIGH_WRIST_POS;
-    downFailCondition = goingDown && tooFarDown;
-    upFailCondition = !goingDown && tooFarUp;
-
-    System.out.println("speed: " + speed);
-    System.out.println("tooFarDown: " + tooFarDown + " tooFarUp: " + tooFarUp);
-    System.out.println("upFail: " + upFailCondition + " downFail: " + downFailCondition);
-    if((goingDown && tooFarDown) || (!goingDown && tooFarUp)) {
+    if((goingDown && currentPosition >= LOW_WRIST_POS) || (!goingDown && currentPosition <= HIGH_WRIST_POS)){
       wrist.move(0);
       System.out.println("Not Moving");
-    }else 
+    }else {
       //Divided by four to reduce speed
       System.out.println("Moving");
       wrist.move(speed/WRIST_SPEED_LIMITER);
+    }
   }
 
   // Called once the command ends or is interrupted.

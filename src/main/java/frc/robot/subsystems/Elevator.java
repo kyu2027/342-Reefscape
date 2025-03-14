@@ -147,9 +147,10 @@ public class Elevator extends SubsystemBase {
 
     if(goingDown && tooLow || !goingDown && tooHigh)
       stop();
-    else
+    else {
       elevatorPID.setReference(nextPosition, ControlType.kPosition);
       currentPosition = nextPosition;
+    }
   }
 
   //This method will set the elevator motors to the inputted value

@@ -44,6 +44,7 @@ public class SwerveDrive extends SubsystemBase {
   private ChassisSpeeds chassisSpeeds;
   
   private boolean fieldOriented; 
+  private boolean slowMode;
   
   private SwerveModule frontLeftModule;
   private SwerveModule frontRightModule;
@@ -124,6 +125,7 @@ public class SwerveDrive extends SubsystemBase {
         );
 
         fieldOriented = false;
+        slowMode = false;
 
       poseSupplier = () -> getPose2d();
       resetPoseConsumer = pose -> resetOdometry(pose);
@@ -155,6 +157,14 @@ public class SwerveDrive extends SubsystemBase {
       
       fieldOriented = !fieldOriented;
 
+    }
+
+    public void toggleSlowMode() {
+      slowMode = !slowMode;
+    }
+
+    public boolean getSlowMode() {
+      return slowMode;
     }
 
     public ChassisSpeeds getChassisSpeeds(){
@@ -229,6 +239,10 @@ public class SwerveDrive extends SubsystemBase {
     public void resetOdometry(Pose2d pose){
        odometry.resetPosition(NavX.getRotation2d(), getCurrentSwerveModulePositions(), pose);
     }
+    
+    public AHRS getGyro(){
+      return NavX;
+    }
 
     public void configureAutoBuilder() {
       AutoBuilder.configure(
@@ -287,6 +301,7 @@ public class SwerveDrive extends SubsystemBase {
     putBackRightModule(sendableBuilder);
 
     sendableBuilder.addBooleanProperty("Field Orienated", ()-> fieldOriented, null);
+    sendableBuilder.addBooleanProperty("Slow Mode", ()-> slowMode, null);
     sendableBuilder.addDoubleProperty("Gyro Reading", ()-> NavX.getAngle(), null);
 
     sendableBuilder.addDoubleProperty("FL Distance Travlled", ()-> frontLeftModule.getDistance(), null);
