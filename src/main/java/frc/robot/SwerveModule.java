@@ -64,7 +64,7 @@ public class SwerveModule {
     private String label;
 
 
-    public SwerveModule (int driveID, int rotateID, int magEncoderPort, boolean invertRotate, boolean invertDrive, double encoderOffset, String label){
+    public SwerveModule (int driveID, int rotateID, int magEncoderPort, boolean invertRotate, boolean invertDrive, double encoderOffset, String label, double diameter){
 
         driveMotor = new SparkMax(driveID, MotorType.kBrushless);
         rotateMotor = new SparkMax(rotateID, MotorType.kBrushless);
@@ -89,9 +89,12 @@ public class SwerveModule {
         driveEnconder = driveMotor.getEncoder();
         rotateEncoder = rotateMotor.getEncoder();
 
+        double drivePosConversion = ((Math.PI * diameter) / DriveConstants.DRIVE_GEAR_RATIO);
+        double driveVelConversion = drivePosConversion / 60;
+
         /* Sets the Drive converstion (Posistion and Velocity)  factors  */
-        driveConfig.encoder.positionConversionFactor(DriveConstants.DRIVE_POSITION_CONVERSION); //POSITION
-        driveConfig.encoder.velocityConversionFactor(DriveConstants.DRIVE_VELOCITY_CONVERSION); //VELOCITY
+        driveConfig.encoder.positionConversionFactor(drivePosConversion); //POSITION
+        driveConfig.encoder.velocityConversionFactor(driveVelConversion); //VELOCITY
 
         /* Set the Rotate conversion (Posistion and Velocity) factors */
         rotateConfig.encoder.positionConversionFactor(DriveConstants.ROTATE_POSITION_CONVERSION); //POSITION

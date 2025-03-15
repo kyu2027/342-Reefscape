@@ -11,6 +11,14 @@ import frc.robot.subsystems.Claw;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.Wrist;
+
+import org.opencv.core.Mat;
+
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.path.PathConstraints;
+
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 
@@ -35,10 +43,28 @@ public final class Autos {
     Commands.runOnce(() -> {claw.slowOutakeCoral();}).withTimeout(2)
 
     );
-
+   
   } 
 
-  
+   public static Command move(SwerveDrive swerve){
+
+    return AutoBuilder.pathfindToPose(new Pose2d(3,0,new Rotation2d(0)), new PathConstraints(1, 20, 1.0, 1.0));
+     
+    }
+
+
+    public static Command leftAndDiagonal(SwerveDrive swerve){
+
+      return Commands.sequence(
+        
+      AutoBuilder.pathfindToPose(swerve.setPose2d(2, 5, (Math.PI / 2)), DriveConstants.CONSTRAINTS),
+      
+      AutoBuilder.pathfindToPose(swerve.setPose2d(4, 6, (Math.PI / 2)), DriveConstants.CONSTRAINTS)
+      
+      );
+
+    }
+
 
   private Autos() {
     throw new UnsupportedOperationException("This is a utility class!");

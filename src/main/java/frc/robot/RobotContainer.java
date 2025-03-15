@@ -22,6 +22,7 @@ import frc.robot.subsystems.*;
 
 import static frc.robot.Constants.ElevatorConstants.*;
 import static frc.robot.Constants.WristConstants.*;
+import static frc.robot.Constants.ElevatorConstants.*;
 
 import java.io.Writer;
 import java.security.AlgorithmConstraints;
@@ -247,6 +248,11 @@ public class RobotContainer {
     autoChooser.addOption("Drive Foward", Autos.driveFoward(swerve));
     autoChooser.addOption("Score Middle", Autos.scoreMiddle(swerve,wrist,claw));
     autoChooser.addOption("Do Nothing", Autos.doNothing(swerve));
+
+    autoChooser.addOption("Pose Drive", Autos.move(swerve));
+    autoChooser.addOption("Pose Drive 2", Autos.leftAndDiagonal(swerve));
+
+    //autoChooser.addOption("Test PATHPLANNER", new PathPlannerAuto("Test Auto"));
 
     // Smartdashboard Data 
     SmartDashboard.putData(wrist);
