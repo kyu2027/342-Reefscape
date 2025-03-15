@@ -56,6 +56,7 @@ public final class Constants {
     public static final double INTAKE_POSITION = 0.2; // 0.0
     public static final double L1_POSITION = 0.2; // 0.0
     public static final double L2_POSITION = 0.59; //  0.39
+    public static final double L3_POSITION = 0.71;
     public static final double L4_POSITION = 1.249; // 1.049
     public static final double SAFE_POSITION = 1.769; // 1.569
     public static final double MOVE_VALUE = 1.869; // 1.569
@@ -73,6 +74,7 @@ public final class Constants {
       MOVE_POSITION(MOVE_VALUE,ALGAE_POSITION),
       LOW_WRIST_POSITION(INTAKE_POSITION,ALGAE_POSITION),
       MIDDLE_WRIST_POSITION(L2_POSITION,ALGAE_POSITION), //CHANGE MADE
+      L3_WRIST_POSITION(L3_POSITION, ALGAE_POSITION),
       HIGH_WRIST_POSITION(L4_POSITION,BARGE_POSITION), //CHANGE MADE
       PROCESSOR_WRIST_POSITION(INTAKE_POSITION,ALGAE_POSITION),
       ALGAE_WRIST_POSITION(ALGAE_POSITION,ALGAE_POSITION);
@@ -185,17 +187,17 @@ public final class Constants {
     public static final double DRIVE_FF_VALUE = 0.9;
 
     // Rotate PID Values
-    public static final double ROTATE_P_VALUE = 0.25;
+    public static final double ROTATE_P_VALUE = 0.3;
     public static final double ROTATE_I_VALUE = 0.0;
     public static final double ROTATE_D_VALUE = 0.3;
     public static double ROTATE_FF_VALUE;
 
     // Offsets
 
-    public static final double FRONT_LEFT_OFFSET = 0.83;
-    public static final double FRONT_RIGHT_OFFSET = 4.57;
-    public static final double BACK_LEFT_OFFSET = 3.08;
-    public static final double BACK_RIGHT_OFFSET = 5.89;
+    public static final double FRONT_LEFT_OFFSET = 0.81;
+    public static final double FRONT_RIGHT_OFFSET = 4.42;
+    public static final double BACK_LEFT_OFFSET = 3.09;
+    public static final double BACK_RIGHT_OFFSET = 5.96;
 
 
     // Factors
