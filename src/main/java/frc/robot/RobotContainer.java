@@ -186,7 +186,7 @@ public class RobotContainer {
       new MoveElevatorToPosition(elevator, wrist, ElevatorHeights.HIGH_MIDDLE_POSITION_L3), 
       new ParallelCommandGroup(
         new MoveElevatorToPosition(elevator, wrist, ElevatorHeights.HIGH_MIDDLE_POSITION_L3, true), 
-        new WristToPosition(wrist, WristPositions.MIDDLE_WRIST_POSITION)
+        new WristToPosition(wrist, WristPositions.L3_WRIST_POSITION)
       )
     );
 
