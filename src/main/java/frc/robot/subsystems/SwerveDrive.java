@@ -72,6 +72,8 @@ public class SwerveDrive extends SubsystemBase {
     /** Creates a new SwerveDrive. */
     public SwerveDrive() {
   
+        chassisSpeeds = new ChassisSpeeds(0, 0, 0);
+
         frontLeftModule = new SwerveModule(
           DriveConstants.FRONT_LEFT_DRIVE_ID, 
           DriveConstants.FRONT_LEFT_ROTATE_ID, 
