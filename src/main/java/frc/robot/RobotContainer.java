@@ -7,6 +7,7 @@ package frc.robot;
 import frc.robot.commands.DriveWithJoystick;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.commands.SpinClaw;
+import frc.robot.commands.TimedRumble;
 import frc.robot.commands.Auto.Autos;
 import frc.robot.commands.Auto.RotateToAngle;
 import frc.robot.commands.Claw.Intake;
@@ -98,6 +99,8 @@ public class RobotContainer {
 
   private SendableChooser<Command> autoChooser;
 
+  private ParallelCommandGroup intakeWithRumble;
+
   private SequentialCommandGroup goToIntake;
   private SequentialCommandGroup goToL2;
   private SequentialCommandGroup goToL3;
@@ -156,7 +159,7 @@ public class RobotContainer {
 
     resetEncoder = Commands.runOnce(() -> {wrist.resetEncoder();});
 
-    intake = new Intake(claw, wrist);
+    //intake = new Intake(claw, wrist);
     outtake = new Outtake(wrist, claw);
 
     toggleAlgaeMode = new SequentialCommandGroup(Commands.runOnce(() -> {wrist.setAlgaeMode();}, wrist), new WristToPosition(wrist, WristPositions.TOGGLE_POSITION));
@@ -168,6 +171,14 @@ public class RobotContainer {
 
     slowModeToggle = Commands.runOnce(() -> {swerve.toggleSlowMode();}, swerve);
  
+    /*
+     * Creates a parallel command group that rumbles the controller
+     * when the coral has been fully intaked
+     */
+    intakeWithRumble = new ParallelCommandGroup(
+      new Intake(claw, wrist),
+      new TimedRumble(claw, operator, 1, 0.5)
+    );
 
     // Creating sequential command groups that use wrist and elevator
     goToIntake = new SequentialCommandGroup(
@@ -301,7 +312,7 @@ public class RobotContainer {
     level4Button.onTrue(goToL4);
 
     // claw
-    intakeButton.whileTrue(intake);
+    intakeButton.whileTrue(intakeWithRumble);
     outtakeButton.whileTrue(outtake);
     slowOuttakeButton.whileTrue(slowOuttake);
     reverseCoralButton.whileTrue(reverseCoralIntake);
