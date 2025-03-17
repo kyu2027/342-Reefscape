@@ -96,7 +96,9 @@ public class Claw extends SubsystemBase {
       //return currPos;
     //}
 
-
+  public boolean hasCoral() {
+    return !forwardSensor.get() && !backwardSensor.get();
+  }
   
   @Override
   public void initSendable (SendableBuilder sendableBuilder) {
