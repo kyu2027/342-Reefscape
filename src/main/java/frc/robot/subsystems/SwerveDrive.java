@@ -76,40 +76,48 @@ public class SwerveDrive extends SubsystemBase {
           DriveConstants.FRONT_LEFT_DRIVE_ID, 
           DriveConstants.FRONT_LEFT_ROTATE_ID, 
           DriveConstants.FL_ENCODER_PORT, 
+
           false, true, 
           DriveConstants.FRONT_LEFT_OFFSET, 
           "FL",
           DriveConstants.FL_WHEEL_DIAMETER
+
           );
   
           frontRightModule = new SwerveModule(
           DriveConstants.FRONT_RIGHT_DRIVE_ID, 
           DriveConstants.FRONT_RIGHT_ROTATE_ID, 
           DriveConstants.FR_ENCODER_PORT, 
+
           false, true, 
           DriveConstants.FRONT_RIGHT_OFFSET, 
           "FR",
           DriveConstants.FR_WHEEL_DIAMETER
+
           );
   
           backLeftModule = new SwerveModule(
           DriveConstants.BACK_LEFT_DRIVE_ID, 
           DriveConstants.BACK_LEFT_ROTATE_ID, 
           DriveConstants.BL_ENCODER_PORT, 
+
           false, true, 
           DriveConstants.BACK_LEFT_OFFSET, 
           "BL",
           DriveConstants.BL_WHEEL_DIAMETER
+
           );
   
           backRightModule = new SwerveModule(
           DriveConstants.BACK_RIGHT_DRIVE_ID, 
           DriveConstants.BACK_RIGHT_ROTATE_ID, 
           DriveConstants.BR_ENCODER_PORT, 
+
           false, true, 
           DriveConstants.BACK_RIGHT_OFFSET, 
           "BR",
           DriveConstants.BR_WHEEL_DIAMETER
+
           );
   
           field = new Field2d();
@@ -131,7 +139,9 @@ public class SwerveDrive extends SubsystemBase {
         odometry = new SwerveDriveOdometry( 
   
           kinematics, 
+
           Rotation2d.fromDegrees(-NavX.getAngle() % 360),
+
           getCurrentSwerveModulePositions()
   
           );
@@ -154,7 +164,9 @@ public class SwerveDrive extends SubsystemBase {
           e.printStackTrace();
         }    
 
+
         field = new Field2d();
+
   
           new Thread(() -> {
             try {
@@ -182,7 +194,9 @@ public class SwerveDrive extends SubsystemBase {
   
       public ChassisSpeeds getChassisSpeeds(){
   
+
         return chassisSpeeds;
+
   
       }
   
@@ -370,9 +384,9 @@ public class SwerveDrive extends SubsystemBase {
     // This method will be called once per scheduler run
 
     //Updates the odometry every run
+
     odometry.update(Rotation2d.fromDegrees(-NavX.getAngle() % 360), getCurrentSwerveModulePositions());
     field.setRobotPose(odometry.getPoseMeters());
-    
 
   }
 }
