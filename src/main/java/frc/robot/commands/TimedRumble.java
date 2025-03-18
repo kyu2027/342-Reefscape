@@ -25,6 +25,7 @@ public class TimedRumble extends Command {
     this.joy = joy;
     this.time = time;
     this.strength = strength;
+    timer = new Timer();
 
     // Use addRequirements() here to declare subsystem dependencies.
   }
