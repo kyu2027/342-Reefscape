@@ -177,6 +177,7 @@ public class RobotContainer {
      */
     intakeWithRumble = new ParallelCommandGroup(
       new Intake(claw, wrist),
+      new TimedRumble(claw, driver, 1, 0.5),
       new TimedRumble(claw, operator, 1, 0.5)
     );
 
