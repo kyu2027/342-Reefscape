@@ -33,7 +33,7 @@ public class RotateToAngle extends Command {
     addRequirements(swerve);
 
     rotateController = new PIDController(
-      .035,.0,0
+      .025,.0,0
       );
 
       rotateController.reset();
@@ -60,7 +60,7 @@ public class RotateToAngle extends Command {
 
     rotateController.setSetpoint(end);
 
-    current = swerve.getGyro().getAngle();
+    current = -swerve.getGyro().getAngle();
 
     double rotationSpeed = rotateController.calculate(current, end);
 

@@ -60,13 +60,15 @@ public class DriveWithJoystick extends Command {
      if (swerve.getSlowMode()){
       xSpeed = xSpeed * DriveConstants.SLOW_DRIVE_SPEED;
       ySpeed = ySpeed * DriveConstants.SLOW_DRIVE_SPEED;
+      rotateSpeed = rotateSpeed * DriveConstants.SLOW_ROTATE_SPEED;
      } else {
      xSpeed = xSpeed * DriveConstants.MAX_DRIVE_SPEED;
      ySpeed = ySpeed * DriveConstants.MAX_DRIVE_SPEED;
+     rotateSpeed = rotateSpeed * DriveConstants.MAX_ROTATE_SPEED;
     }
 
       /* Puts the x,y, and rotates speeds into a new ChassisSpeeds */
-      chassisSpeeds = new ChassisSpeeds(xSpeed, ySpeed, rotateSpeed);
+      chassisSpeeds = new ChassisSpeeds(-xSpeed, -ySpeed, -rotateSpeed);
 
       /* Passes through the Chassisspeeds just created into the Drive Method */
       swerve.drive(chassisSpeeds);
@@ -76,7 +78,6 @@ public class DriveWithJoystick extends Command {
       /* Gets values from the Left(Drive) and Right(Rotate) Joysticks on the Xbox controller */
       double xSpeed = joyStick.getLeftY();
       double ySpeed = joyStick.getLeftX();
-
 
       /*Applies deadband */
       xSpeed = MathUtil.applyDeadband(xSpeed, 0.15);
@@ -95,9 +96,7 @@ public class DriveWithJoystick extends Command {
       double rSpeed = -visionPID.calculate(tx, 0);
   
       /* Puts the x,y, and rotates speeds into a new ChassisSpeeds */
-
       chassisSpeeds = new ChassisSpeeds(-xSpeed, -ySpeed, -rSpeed);
-
 
       /* Passes through the Chassisspeeds just created into the Drive Method */
       swerve.drive(chassisSpeeds);

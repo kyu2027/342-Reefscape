@@ -16,7 +16,7 @@ import frc.robot.commands.Elevator.MoveElevatorWithJoystick;
 import frc.robot.commands.Wrist.WristToPosition;
 import frc.robot.commands.Wrist.WristWithJoystick;
 import frc.robot.Constants.ElevatorConstants.ElevatorHeights;
-import frc.robot.Constants.OperatorConstants;
+import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.WristConstants.WristPositions;
 import frc.robot.subsystems.*;
 
@@ -40,6 +40,9 @@ import edu.wpi.first.wpilibj2.command.Commands;
 
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.UsbCamera;
+import edu.wpi.first.cscore.VideoSink;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
@@ -84,7 +87,6 @@ public class RobotContainer {
   private DriveWithJoystick driveWithJoystick;
   private Command fieldOrienatedCommand;
   private Command slowModeToggle;
-  private RotateToAngle rotateToAngle;
 
   private Command driveAssistToggle;
 
@@ -93,6 +95,8 @@ public class RobotContainer {
 
   private Command reverseCoralIntake;
   private Command slowOuttake;
+
+  private Command limeLightReset;
 
   private Command resetEncoder;
 
@@ -125,10 +129,12 @@ public class RobotContainer {
 
   private POVButton resetEncoderButton;
 
-  private JoystickButton rotate90Button;
-
   private JoystickButton reverseCoralButton;
   private JoystickButton slowOuttakeButton;
+
+  private JoystickButton limeLighButton;
+
+  public UsbCamera camera;
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -148,7 +154,6 @@ public class RobotContainer {
     // Commands 
     wristWithJoy = new WristWithJoystick(operator, wrist);
     moveElevatorWithJoystick = new MoveElevatorWithJoystick(elevator,wrist, operator);
-    rotateToAngle = new RotateToAngle(180, swerve);
 
     reverseCoralIntake = Commands.startEnd(() -> {claw.spin(.1);}, () -> {claw.spin(0);}, claw);
     
@@ -167,8 +172,9 @@ public class RobotContainer {
       }, swerve);
 
     slowModeToggle = Commands.runOnce(() -> {swerve.toggleSlowMode();}, swerve);
+    
+    limeLightReset = Commands.runOnce(() -> {swerve.resetPoseLimelight();}, swerve);
  
-
     // Creating sequential command groups that use wrist and elevator
     goToIntake = new SequentialCommandGroup(
       new WristToPosition(wrist, WristPositions.TOGGLE_POSITION),
@@ -193,7 +199,7 @@ public class RobotContainer {
       new MoveElevatorToPosition(elevator, wrist, ElevatorHeights.HIGH_MIDDLE_POSITION_L3), 
       new ParallelCommandGroup(
         new MoveElevatorToPosition(elevator, wrist, ElevatorHeights.HIGH_MIDDLE_POSITION_L3, true), 
-        new WristToPosition(wrist, WristPositions.MIDDLE_WRIST_POSITION)
+        new WristToPosition(wrist, WristPositions.L3_WRIST_POSITION)
       )
     );
 
@@ -229,18 +235,18 @@ public class RobotContainer {
 
     resetEncoderButton = new POVButton(operator, 270);
 
-    fieldOrienatedButton = new JoystickButton(driver, XboxController.Button.kY.value);
-    slowModeButton = new JoystickButton(driver, XboxController.Button.kLeftBumper.value);
+    fieldOrienatedButton = new JoystickButton(driver, XboxController.Button.kA.value);
+    slowModeButton = new JoystickButton(driver, XboxController.Button.kX.value);
     driveWithJoystick = new DriveWithJoystick(swerve, driver);
 
     driveAssistButton = new JoystickButton(driver, XboxController.Button.kB.value);
     wristOverrideButton = new JoystickButton(operator, XboxController.Button.kStart.value);
     elevatorOverrideButton = new JoystickButton(operator, XboxController.Button.kBack.value);
 
-    rotate90Button = new JoystickButton(driver, XboxController.Button.kA.value);
-
     slowOuttakeButton = new JoystickButton(operator, XboxController.Button.kRightStick.value);
     reverseCoralButton = new JoystickButton(operator, XboxController.Button.kLeftStick.value);
+
+    limeLighButton = new JoystickButton(driver, XboxController.Button.kLeftBumper.value);
 
     // Autos
     autoChooser = new SendableChooser<>();
@@ -250,7 +256,8 @@ public class RobotContainer {
     autoChooser.addOption("Do Nothing", Autos.doNothing(swerve));
 
     autoChooser.addOption("Pose Drive", Autos.move(swerve));
-    autoChooser.addOption("Pose Drive 2", Autos.leftAndDiagonal(swerve));
+    autoChooser.addOption("score", Autos.middleScore(swerve, elevator, wrist, claw));
+    autoChooser.addOption("Left Auto", Autos.leftScore(swerve, elevator, wrist, claw));
 
     //autoChooser.addOption("Test PATHPLANNER", new PathPlannerAuto("Test Auto"));
 
@@ -265,6 +272,10 @@ public class RobotContainer {
     wrist.setDefaultCommand(wristWithJoy);
     elevator.setDefaultCommand(moveElevatorWithJoystick);
     swerve.setDefaultCommand(driveWithJoystick);
+
+    camera = CameraServer.startAutomaticCapture();
+    camera.setResolution(320, 420);
+    camera.setFPS(30);
 
     configureBindings();
 
@@ -306,13 +317,10 @@ public class RobotContainer {
     slowOuttakeButton.whileTrue(slowOuttake);
     reverseCoralButton.whileTrue(reverseCoralIntake);
 
-    rotate90Button.onTrue(rotateToAngle);
-    
-
     elevatorOverrideButton.onTrue(moveElevatorWithJoystick);
     wristOverrideButton.onTrue(wristWithJoy);
 
-    
+    limeLighButton.whileTrue(limeLightReset);
 
     //outtakeButton.whileTrue();
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
