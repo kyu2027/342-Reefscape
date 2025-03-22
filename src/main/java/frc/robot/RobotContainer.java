@@ -157,7 +157,7 @@ public class RobotContainer {
 
     reverseCoralIntake = Commands.startEnd(() -> {claw.spin(.1);}, () -> {claw.spin(0);}, claw);
     
-    slowOuttake = Commands.runOnce(() -> {claw.slowOutakeCoral();});
+    slowOuttake = Commands.startEnd(() -> {claw.slowOutakeCoral();}, () -> {claw.spin(0);}, claw);
 
     resetEncoder = Commands.runOnce(() -> {wrist.resetEncoder();});
 

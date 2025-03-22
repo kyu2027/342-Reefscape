@@ -80,7 +80,7 @@ public final class Autos {
 
       Commands.runOnce(() -> {swerve.resetPoseLimelight();}),
 
-      swerve.setPose2d(6.68, 4.19, Math.PI),
+      swerve.setPose2d(6.68, 4.30, Math.PI),
 
       new SequentialCommandGroup(
       new WristToPosition(wrist, WristPositions.TOGGLE_POSITION),
@@ -92,7 +92,7 @@ public final class Autos {
 
       new ParallelCommandGroup(
       new MoveElevatorToPosition(elevator, wrist, ElevatorHeights.HIGH_POSITION_L4, true),
-      swerve.setSlowPose2d(5.73, 4.19, Math.PI)).withTimeout(2.5),
+      swerve.setSlowPose2d(5.66, 4.31, Math.PI)).withTimeout(2.5),
 
       new ParallelCommandGroup(
       new MoveElevatorToPosition(elevator, wrist, ElevatorHeights.HIGH_POSITION_L4, true),
@@ -100,7 +100,7 @@ public final class Autos {
       
       new ParallelCommandGroup(
       new MoveElevatorToPosition(elevator, wrist, ElevatorHeights.HIGH_POSITION_L4, true),
-      swerve.setSlowPose2d(6.68, 4.19, Math.PI)).withTimeout(3),
+      swerve.setSlowPose2d(6.68, 4.30, Math.PI)).withTimeout(3),
 
       new SequentialCommandGroup(
       new WristToPosition(wrist, WristPositions.TOGGLE_POSITION)),
@@ -134,7 +134,7 @@ public final class Autos {
 
       new ParallelCommandGroup(
       new MoveElevatorToPosition(elevator, wrist, ElevatorHeights.HIGH_POSITION_L4, true),
-      swerve.setSlowPose2d(5.3, 5.1, (Units.degreesToRadians(236)))).withTimeout(3),
+      swerve.setSlowPose2d(4.98, 5.18, (Units.degreesToRadians(236)))).withTimeout(3),
 
         new ParallelCommandGroup(
         new MoveElevatorToPosition(elevator, wrist, ElevatorHeights.HIGH_POSITION_L4, true),
