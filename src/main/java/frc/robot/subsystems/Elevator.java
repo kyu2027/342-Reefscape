@@ -90,8 +90,8 @@ public class Elevator extends SubsystemBase {
 
     //PID values are still being tuned, but these values do work
     elevatorRightMotorConfig.closedLoop
-      .pid(0.003, 0, 0)
-      .outputRange(-.45, .75);
+      .pid(0.005, 0, 0)
+      .outputRange(-.5, .85);
     // elevatorRightMotorConfig.closedLoop.maxMotion.maxAcceleration(2);
     // elevatorRightMotorConfig.closedLoop.maxMotion.maxVelocity(10);
     // elevatorRightMotorConfig.closedLoop.maxMotion.allowedClosedLoopError(10);
