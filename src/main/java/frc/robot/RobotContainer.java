@@ -90,6 +90,8 @@ public class RobotContainer {
 
   private Command driveAssistToggle;
 
+  private MoveElevatorToPosition elevatorHoldTest;
+
   private Command toggleCoralMode;
   private Command toggleAlgaeMode;
 
@@ -123,6 +125,8 @@ public class RobotContainer {
 
   private JoystickButton elevatorOverrideButton;
   private JoystickButton wristOverrideButton;
+
+  private POVButton elevatorHoldTestButton;
 
   private POVButton toggleCoralModeButton;
   private POVButton toggleAlgaeModeButton;
@@ -163,6 +167,8 @@ public class RobotContainer {
 
     intake = new Intake(claw, wrist);
     outtake = new Outtake(wrist, claw);
+
+    elevatorHoldTest = new MoveElevatorToPosition(elevator, wrist, ElevatorHeights.HIGH_POSITION_L4);
 
     toggleAlgaeMode = new SequentialCommandGroup(Commands.runOnce(() -> {wrist.setAlgaeMode();}, wrist), new WristToPosition(wrist, WristPositions.TOGGLE_POSITION));
     toggleCoralMode = new SequentialCommandGroup(Commands.runOnce(() -> {wrist.setCoralMode();}, wrist), new WristToPosition(wrist, WristPositions.TOGGLE_POSITION));
@@ -230,6 +236,8 @@ public class RobotContainer {
     intakeButton = new JoystickButton(operator, XboxController.Button.kLeftBumper.value);
     outtakeButton = new JoystickButton(operator,XboxController.Button.kRightBumper.value);
 
+    elevatorHoldTestButton = new POVButton(operator, 90);
+
     toggleAlgaeModeButton = new POVButton(operator, 0);
     toggleCoralModeButton = new POVButton(operator, 180);
 
@@ -296,6 +304,8 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
+
+    elevatorHoldTestButton.onTrue(elevatorHoldTest);
 
     toggleAlgaeModeButton.onTrue(toggleAlgaeMode);
     toggleCoralModeButton.onTrue(toggleCoralMode);
