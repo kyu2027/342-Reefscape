@@ -90,8 +90,6 @@ public class RobotContainer {
 
   private Command driveAssistToggle;
 
-  private MoveElevatorToPosition elevatorHoldTest;
-
   private Command toggleCoralMode;
   private Command toggleAlgaeMode;
 
@@ -125,8 +123,6 @@ public class RobotContainer {
 
   private JoystickButton elevatorOverrideButton;
   private JoystickButton wristOverrideButton;
-
-  private POVButton elevatorHoldTestButton;
 
   private POVButton toggleCoralModeButton;
   private POVButton toggleAlgaeModeButton;
@@ -168,8 +164,6 @@ public class RobotContainer {
     intake = new Intake(claw, wrist);
     outtake = new Outtake(wrist, claw);
 
-    elevatorHoldTest = new MoveElevatorToPosition(elevator, wrist, ElevatorHeights.HIGH_POSITION_L4);
-
     toggleAlgaeMode = new SequentialCommandGroup(Commands.runOnce(() -> {wrist.setAlgaeMode();}, wrist), new WristToPosition(wrist, WristPositions.TOGGLE_POSITION));
     toggleCoralMode = new SequentialCommandGroup(Commands.runOnce(() -> {wrist.setCoralMode();}, wrist), new WristToPosition(wrist, WristPositions.TOGGLE_POSITION));
 
@@ -185,46 +179,31 @@ public class RobotContainer {
     goToIntake = new SequentialCommandGroup(
       new WristToPosition(wrist, WristPositions.TOGGLE_POSITION),
       new MoveElevatorToPosition(elevator, wrist, ElevatorHeights.LOW_POSITION_L1),
-      new ParallelCommandGroup(
-      new MoveElevatorToPosition(elevator, wrist, ElevatorHeights.LOW_POSITION_L1, true), 
       new WristToPosition(wrist, WristPositions.LOW_WRIST_POSITION)
-      )
     );
 
     goToL2 = new SequentialCommandGroup(
       new WristToPosition(wrist, WristPositions.TOGGLE_POSITION),
       new MoveElevatorToPosition(elevator, wrist, ElevatorHeights.LOW_MIDDLE_POSITION_L2), 
-      new ParallelCommandGroup(
-        new MoveElevatorToPosition(elevator, wrist, ElevatorHeights.LOW_MIDDLE_POSITION_L2, true), 
-        new WristToPosition(wrist, WristPositions.MIDDLE_WRIST_POSITION)
-      )
+      new WristToPosition(wrist, WristPositions.MIDDLE_WRIST_POSITION)
     );
 
     goToL3 = new SequentialCommandGroup(
       new WristToPosition(wrist, WristPositions.TOGGLE_POSITION),
-      new MoveElevatorToPosition(elevator, wrist, ElevatorHeights.HIGH_MIDDLE_POSITION_L3), 
-      new ParallelCommandGroup(
-        new MoveElevatorToPosition(elevator, wrist, ElevatorHeights.HIGH_MIDDLE_POSITION_L3, true), 
-        new WristToPosition(wrist, WristPositions.L3_WRIST_POSITION)
-      )
+      new MoveElevatorToPosition(elevator, wrist, ElevatorHeights.HIGH_MIDDLE_POSITION_L3),  
+      new WristToPosition(wrist, WristPositions.L3_WRIST_POSITION)
     );
 
     goToL4 = new SequentialCommandGroup(
       new WristToPosition(wrist, WristPositions.TOGGLE_POSITION),
       new MoveElevatorToPosition(elevator, wrist, ElevatorHeights.HIGH_POSITION_L4),
-      new ParallelCommandGroup(
-        new MoveElevatorToPosition(elevator, wrist, ElevatorHeights.HIGH_POSITION_L4, true), 
-        new WristToPosition(wrist, WristPositions.HIGH_WRIST_POSITION)
-      )
+      new WristToPosition(wrist, WristPositions.HIGH_WRIST_POSITION)
     );
 
     goToProcessor = new SequentialCommandGroup(
       new WristToPosition(wrist, WristPositions.TOGGLE_POSITION),
       new MoveElevatorToPosition(elevator, wrist, ElevatorHeights.PROCESSOR_POSITION),
-      new ParallelCommandGroup(
-        new MoveElevatorToPosition(elevator, wrist, ElevatorHeights.PROCESSOR_POSITION, true), 
-        new WristToPosition(wrist, WristPositions.ALGAE_WRIST_POSITION)
-      )
+      new WristToPosition(wrist, WristPositions.ALGAE_WRIST_POSITION)
     );
 
     // Button Assigments 
@@ -235,8 +214,6 @@ public class RobotContainer {
 
     intakeButton = new JoystickButton(operator, XboxController.Button.kLeftBumper.value);
     outtakeButton = new JoystickButton(operator,XboxController.Button.kRightBumper.value);
-
-    elevatorHoldTestButton = new POVButton(operator, 90);
 
     toggleAlgaeModeButton = new POVButton(operator, 0);
     toggleCoralModeButton = new POVButton(operator, 180);
@@ -304,8 +281,6 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
-
-    elevatorHoldTestButton.onTrue(elevatorHoldTest);
 
     toggleAlgaeModeButton.onTrue(toggleAlgaeMode);
     toggleCoralModeButton.onTrue(toggleCoralMode);
