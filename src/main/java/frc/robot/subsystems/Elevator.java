@@ -30,6 +30,7 @@ public class Elevator extends SubsystemBase {
   private boolean goingDown;
   private boolean tooLow;
   private boolean tooHigh;
+  private boolean atPosition;
 
   private double currentPosition;
 
@@ -48,6 +49,7 @@ public class Elevator extends SubsystemBase {
   public Elevator() {
 
     goingDown = false;
+    atPosition = false;
 
     elevatorLeftMotor = new SparkMax(ELEVATORLEFT_ID, MotorType.kBrushless);
     elevatorRightMotor = new SparkMax(ELEVATORRIGHT_ID, MotorType.kBrushless);
@@ -135,6 +137,7 @@ public class Elevator extends SubsystemBase {
 
   //Moves the elevator to the given position
   public void ElevatorToPosition(double nextPosition) {
+    atPosition = false;
 
     goingDown = currentPosition > nextPosition;
     tooLow = elevatorEncoder.getPosition() < BOTTOM_POSITION;
@@ -146,6 +149,8 @@ public class Elevator extends SubsystemBase {
       elevatorPID.setReference(nextPosition, ControlType.kPosition);
       currentPosition = nextPosition;
     }
+
+    isAtPosition(nextPosition);
   }
 
   //This method will set the elevator motors to the inputted value
@@ -173,9 +178,16 @@ public class Elevator extends SubsystemBase {
     elevatorPID.setReference(currentPosition, ControlType.kPosition);
   }
 
+  public void isAtPosition(double nextPosition) {
+    atPosition = Math.abs(getEncoderPosition() - nextPosition) < ELEVATOR_ERROR;
+  }
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    if(atPosition) {
+      holdPosition();
+    }
   }
 
   @Override

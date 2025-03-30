@@ -179,46 +179,31 @@ public class RobotContainer {
     goToIntake = new SequentialCommandGroup(
       new WristToPosition(wrist, WristPositions.TOGGLE_POSITION),
       new MoveElevatorToPosition(elevator, wrist, ElevatorHeights.LOW_POSITION_L1),
-      new ParallelCommandGroup(
-      new MoveElevatorToPosition(elevator, wrist, ElevatorHeights.LOW_POSITION_L1, true), 
       new WristToPosition(wrist, WristPositions.LOW_WRIST_POSITION)
-      )
     );
 
     goToL2 = new SequentialCommandGroup(
       new WristToPosition(wrist, WristPositions.TOGGLE_POSITION),
       new MoveElevatorToPosition(elevator, wrist, ElevatorHeights.LOW_MIDDLE_POSITION_L2), 
-      new ParallelCommandGroup(
-        new MoveElevatorToPosition(elevator, wrist, ElevatorHeights.LOW_MIDDLE_POSITION_L2, true), 
-        new WristToPosition(wrist, WristPositions.MIDDLE_WRIST_POSITION)
-      )
+      new WristToPosition(wrist, WristPositions.MIDDLE_WRIST_POSITION)
     );
 
     goToL3 = new SequentialCommandGroup(
       new WristToPosition(wrist, WristPositions.TOGGLE_POSITION),
-      new MoveElevatorToPosition(elevator, wrist, ElevatorHeights.HIGH_MIDDLE_POSITION_L3), 
-      new ParallelCommandGroup(
-        new MoveElevatorToPosition(elevator, wrist, ElevatorHeights.HIGH_MIDDLE_POSITION_L3, true), 
-        new WristToPosition(wrist, WristPositions.L3_WRIST_POSITION)
-      )
+      new MoveElevatorToPosition(elevator, wrist, ElevatorHeights.HIGH_MIDDLE_POSITION_L3),  
+      new WristToPosition(wrist, WristPositions.L3_WRIST_POSITION)
     );
 
     goToL4 = new SequentialCommandGroup(
       new WristToPosition(wrist, WristPositions.TOGGLE_POSITION),
       new MoveElevatorToPosition(elevator, wrist, ElevatorHeights.HIGH_POSITION_L4),
-      new ParallelCommandGroup(
-        new MoveElevatorToPosition(elevator, wrist, ElevatorHeights.HIGH_POSITION_L4, true), 
-        new WristToPosition(wrist, WristPositions.HIGH_WRIST_POSITION)
-      )
+      new WristToPosition(wrist, WristPositions.HIGH_WRIST_POSITION)
     );
 
     goToProcessor = new SequentialCommandGroup(
       new WristToPosition(wrist, WristPositions.TOGGLE_POSITION),
       new MoveElevatorToPosition(elevator, wrist, ElevatorHeights.PROCESSOR_POSITION),
-      new ParallelCommandGroup(
-        new MoveElevatorToPosition(elevator, wrist, ElevatorHeights.PROCESSOR_POSITION, true), 
-        new WristToPosition(wrist, WristPositions.ALGAE_WRIST_POSITION)
-      )
+      new WristToPosition(wrist, WristPositions.ALGAE_WRIST_POSITION)
     );
 
     // Button Assigments 

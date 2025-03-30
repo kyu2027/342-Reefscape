@@ -47,7 +47,7 @@ public final class Constants {
     public static final double WRIST_ZERO = 0.136; //.336
 
     // Wrist PID values; they're a list for sake of simplicity
-    public static final double[] WRIST_PID_VALUES = { 0.37, 0, 0.1 };
+    public static final double[] WRIST_PID_VALUES = { 0.35, 0, 0.1 };
     public static final double WRIST_ERROR = 0.1;
 
     // Wrist position Values (absolute enocder values I think)
