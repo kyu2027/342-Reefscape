@@ -17,6 +17,7 @@ import com.revrobotics.spark.config.MAXMotionConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.MAXMotionConfig.MAXMotionPositionMode;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.ctre.phoenix6.configs.ClosedLoopRampsConfigs;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkClosedLoopController;
 import edu.wpi.first.util.sendable.SendableBuilder;
@@ -92,8 +93,9 @@ public class Elevator extends SubsystemBase {
 
     //PID values are still being tuned, but these values do work
     elevatorRightMotorConfig.closedLoop
-      .pid(0.005, 0, 0)
-      .outputRange(-.5, .85);
+      .pid(0.005, 0, 0.0015)
+      .outputRange(-.5, 1);
+
     // elevatorRightMotorConfig.closedLoop.maxMotion.maxAcceleration(2);
     // elevatorRightMotorConfig.closedLoop.maxMotion.maxVelocity(10);
     // elevatorRightMotorConfig.closedLoop.maxMotion.allowedClosedLoopError(10);
