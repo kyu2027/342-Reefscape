@@ -33,7 +33,7 @@ public class RotateToAngle extends Command {
     addRequirements(swerve);
 
     rotateController = new PIDController(
-      .025,.0,0
+      .042,.01,0
       );
 
       rotateController.reset();

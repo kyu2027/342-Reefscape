@@ -14,6 +14,7 @@ import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.PathConstraints;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 
 /**
@@ -82,8 +83,6 @@ public final class Constants {
       PROCESSOR_WRIST_POSITION(INTAKE_POSITION,ALGAE_POSITION),
       ALGAE_WRIST_POSITION(ALGAE_POSITION,ALGAE_POSITION);
 
-
-
       private double coralPosition;
       private double algaePosition;
 
@@ -141,7 +140,7 @@ public final class Constants {
     public static final double L2_HEIGHT = 241.7 /**300.0*/;
     public static final double L3_HEIGHT = 644.58 /**485.0*/;
     public static final double L4_HEIGHT = 1384.0 /**850.0*/;
-    public static final double PROCESSOR_HEIGHT = 0.0;
+    public static final double PROCESSOR_HEIGHT = 36.0;
 
     public static final double ALGAE_LOW_HEIGHT = 462.36;
     public static final double ALGAE_HIGH_HEIGHT = 884.672;
@@ -162,10 +161,10 @@ public final class Constants {
 
     public static final double WHEEL_DIAMETER = Units.inchesToMeters(3.77);
 
-    public static final double FL_WHEEL_DIAMETER = Units.inchesToMeters(3.74);
-    public static final double FR_WHEEL_DIAMETER = Units.inchesToMeters(3.87);
-    public static final double BL_WHEEL_DIAMETER = Units.inchesToMeters(3.73);
-    public static final double BR_WHEEL_DIAMETER = Units.inchesToMeters(3.77);
+    public static final double FL_WHEEL_DIAMETER = Units.inchesToMeters(3.886);
+    public static final double FR_WHEEL_DIAMETER = Units.inchesToMeters(3.804);
+    public static final double BL_WHEEL_DIAMETER = Units.inchesToMeters(3.808);
+    public static final double BR_WHEEL_DIAMETER = Units.inchesToMeters(3.881);
 
     public static final double WHEEL_CIRCUMFERENCE = 2 * Math.PI;
 
@@ -228,18 +227,61 @@ public final class Constants {
         new PIDConstants(0.25, 0, 0.3));
 
 
-    public static final PathConstraints CONSTRAINTS = new PathConstraints(1.0, 20, 15, 20);
+    public static final PathConstraints CONSTRAINTS = new PathConstraints(2.5, 4, 7, 8);
 
-    public static final PathConstraints SLOW_CONSTRAINTS = new PathConstraints(.2, 5, 5, 10);
+    public static final PathConstraints SLOW_CONSTRAINTS = new PathConstraints(1,2, 6, 7);
+
+
 
   }
 
   public static class AutoConstants {
-    /* 
+
     public enum FieldPoses {
-      MIDDLE_POSE(new Pose2d(1,1, new Rotation2d(0)), new Pose2d(1,1,new Rotation2d(0))),
-      LEFT_POSE(new Pose2d(1,2, new Rotation2d(0)),new Pose2d(1,1,new Rotation2d(0))),
-      RIGHT_POSE(new Pose2d(1,2, new Rotation2d(0)),new Pose2d(1,1,new Rotation2d(0)));
+
+      // Middle poses
+      MIDDLE_START_POSE (
+        new Pose2d(1,1, new Rotation2d(0)),  // Start : Red 
+        new Pose2d(1,1,new Rotation2d(0))),  // Start : Blue 
+
+      MIDDLE_APPROACH_POSE (
+        new Pose2d(1,2, new Rotation2d(0)), // Approach : Red
+        new Pose2d(1,1,new Rotation2d(0))), // Approach : Blue
+
+      MIDDLE_SCORE_POSE (
+        new Pose2d(1,2, new Rotation2d(0)), // Score : Red
+        new Pose2d(1,1,new Rotation2d(0))), // Score : Blue
+
+      // Left Pose
+      LEFT_START_POSE (
+        new Pose2d(1,1, new Rotation2d(0)), // Start : Red 
+        new Pose2d(1,1,new Rotation2d(0))), // Start : Blue 
+
+      LEFT_APPROACH_POSE (
+        new Pose2d(1,2, new Rotation2d(0)), // Approach : Red
+        new Pose2d(1,1,new Rotation2d(0))), // Approach : Red
+
+      LEFT_SCORE_POSE (
+        new Pose2d(1,2, new Rotation2d(0)), // Score : Red
+        new Pose2d(1,1,new Rotation2d(0))), // Score : Blue
+
+      //Right Poses
+      RIGHT_START_POSE (
+        new Pose2d(1,1, new Rotation2d(0)), // Start : Red 
+        new Pose2d(1,1,new Rotation2d(0))), // Start : Blue 
+
+      RIGHT_APPROACH_POSE(
+        new Pose2d(1,2, new Rotation2d(0)), // Approach : Red
+        new Pose2d(1,1,new Rotation2d(0))), // Approach : Blue
+
+      RIGHT_SCORE_POSE(
+        new Pose2d(1,2, new Rotation2d(0)), // Score : Red
+        new Pose2d(1,1,new Rotation2d(0))), // Score : Blue
+
+      TEST_POSES(
+        new Pose2d(3,4, new Rotation2d(0)),  //Red
+        new Pose2d(1,4, new Rotation2d(0))  //Blue
+      );
 
       private Pose2d redSide;
       private Pose2d blueSide;
@@ -249,10 +291,14 @@ public final class Constants {
         this.blueSide = blueSide;
       }
 
+      public Pose2d getPose2d(boolean isRed) {
+        return isRed ? redSide : blueSide;
+      }
 
-
-
-    }
-    */
+    } 
+   
   }
+
+
+
 }

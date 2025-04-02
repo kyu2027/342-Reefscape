@@ -81,7 +81,7 @@ public class Wrist extends SubsystemBase {
     wristConfig.closedLoop.p(WRIST_PID_VALUES[0]);
     wristConfig.closedLoop.i(WRIST_PID_VALUES[1]);
     wristConfig.closedLoop.d(WRIST_PID_VALUES[2]);
-    wristConfig.closedLoop.outputRange(-0.35, .35);
+    wristConfig.closedLoop.outputRange(-0.32, .32);
 
     wrist.configure(wristConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     timer.start();

@@ -92,8 +92,8 @@ public class Elevator extends SubsystemBase {
 
     //PID values are still being tuned, but these values do work
     elevatorRightMotorConfig.closedLoop
-      .pid(0.005, 0, 0)
-      .outputRange(-.5, .85);
+      .pid(0.005, 0, 0.0015)
+      .outputRange(-.5, 1);
     // elevatorRightMotorConfig.closedLoop.maxMotion.maxAcceleration(2);
     // elevatorRightMotorConfig.closedLoop.maxMotion.maxVelocity(10);
     // elevatorRightMotorConfig.closedLoop.maxMotion.allowedClosedLoopError(10);
@@ -180,6 +180,10 @@ public class Elevator extends SubsystemBase {
 
   public void isAtPosition(double nextPosition) {
     atPosition = Math.abs(getEncoderPosition() - nextPosition) < ELEVATOR_ERROR;
+  }
+
+  public void resetElevator(){
+    elevatorEncoder.setPosition(0);
   }
 
   @Override

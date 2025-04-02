@@ -99,6 +99,7 @@ public class RobotContainer {
   private Command limeLightReset;
 
   private Command resetEncoder;
+  private Command resetElevator;
 
   private SendableChooser<Command> autoChooser;
 
@@ -128,6 +129,7 @@ public class RobotContainer {
   private POVButton toggleAlgaeModeButton;
 
   private POVButton resetEncoderButton;
+  private POVButton resetElevatorButton;
 
   private JoystickButton reverseCoralButton;
   private JoystickButton slowOuttakeButton;
@@ -160,6 +162,7 @@ public class RobotContainer {
     slowOuttake = Commands.startEnd(() -> {claw.slowOutakeCoral();}, () -> {claw.spin(0);}, claw);
 
     resetEncoder = Commands.runOnce(() -> {wrist.resetEncoder();});
+    resetElevator = Commands.runOnce(() -> {elevator.resetEncoder();});
 
     intake = new Intake(claw, wrist);
     outtake = new Outtake(wrist, claw);
@@ -219,6 +222,7 @@ public class RobotContainer {
     toggleCoralModeButton = new POVButton(operator, 180);
 
     resetEncoderButton = new POVButton(operator, 270);
+    resetElevatorButton = new POVButton(operator, 90);
 
     fieldOrienatedButton = new JoystickButton(driver, XboxController.Button.kA.value);
     slowModeButton = new JoystickButton(driver, XboxController.Button.kX.value);
@@ -243,6 +247,11 @@ public class RobotContainer {
     autoChooser.addOption("Pose Drive", Autos.move(swerve));
     autoChooser.addOption("score", Autos.middleScore(swerve, elevator, wrist, claw));
     autoChooser.addOption("Left Auto", Autos.leftScore(swerve, elevator, wrist, claw));
+
+    autoChooser.addOption("Two Peice Sketch", Autos.twoPieceMiddle(swerve, elevator, wrist, claw));
+    autoChooser.addOption("One Piece and Load", Autos.singleLoad(swerve, elevator, wrist, claw));
+
+    autoChooser.addOption("Two piece Right", Autos.rightTwoPiece(swerve, elevator, wrist, claw));
 
     //autoChooser.addOption("Test PATHPLANNER", new PathPlannerAuto("Test Auto"));
 
@@ -288,6 +297,7 @@ public class RobotContainer {
     driveAssistButton.whileTrue(Commands.startEnd(()->{swerve.driveAssistOn();},()->{swerve.driveAssistOff();}));
 
     resetEncoderButton.onTrue(resetEncoder);
+    resetElevatorButton.onTrue(resetElevator);
 
 
     // Moves the wrist to a certain position based on what button is pressed
