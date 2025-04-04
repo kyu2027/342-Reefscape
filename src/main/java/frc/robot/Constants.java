@@ -231,8 +231,6 @@ public final class Constants {
 
     public static final PathConstraints SLOW_CONSTRAINTS = new PathConstraints(1,2, 6, 7);
 
-
-
   }
 
   public static class AutoConstants {
@@ -278,9 +276,9 @@ public final class Constants {
         new Pose2d(1,2, new Rotation2d(0)), // Score : Red
         new Pose2d(1,1,new Rotation2d(0))), // Score : Blue
 
-      TEST_POSES(
-        new Pose2d(3,4, new Rotation2d(0)),  //Red
-        new Pose2d(1,4, new Rotation2d(0))  //Blue
+      CORAL_STATION_RIGH_POSE(
+        new Pose2d(1.439,0.836, new Rotation2d(-312)), //Red
+        new Pose2d(1.439,0.836, new Rotation2d(0))  //Blue
       );
 
       private Pose2d redSide;

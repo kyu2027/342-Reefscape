@@ -240,17 +240,15 @@ public class RobotContainer {
     // Autos
     autoChooser = new SendableChooser<>();
     //autoChooser.addOption("PathPlannerTest", new PathPlannerAuto("New Auto"));
-    autoChooser.addOption("Drive Foward", Autos.driveFoward(swerve));
-    autoChooser.addOption("Score Middle", Autos.scoreMiddle(swerve,wrist,claw));
+
     autoChooser.addOption("Do Nothing", Autos.doNothing(swerve));
 
     autoChooser.addOption("Pose Drive", Autos.move(swerve));
-    autoChooser.addOption("score", Autos.middleScore(swerve, elevator, wrist, claw));
-    autoChooser.addOption("Left Auto", Autos.leftScore(swerve, elevator, wrist, claw));
+    //autoChooser.addOption("score", Autos.middleScore(swerve, elevator, wrist, claw));
+    //autoChooser.addOption("Left Auto", Autos.leftScore(swerve, elevator, wrist, claw));
 
-    autoChooser.addOption("Two Peice Sketch", Autos.twoPieceMiddle(swerve, elevator, wrist, claw));
+    autoChooser.addOption("Two Piece Sketch", Autos.twoPieceMiddle(swerve, elevator, wrist, claw));
     autoChooser.addOption("One Piece and Load", Autos.singleLoad(swerve, elevator, wrist, claw));
-
     autoChooser.addOption("Two piece Right", Autos.rightTwoPiece(swerve, elevator, wrist, claw));
 
     //autoChooser.addOption("Test PATHPLANNER", new PathPlannerAuto("Test Auto"));

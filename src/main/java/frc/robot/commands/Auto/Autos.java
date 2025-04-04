@@ -40,31 +40,23 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 public final class Autos {
   /** Example static factory for an autonomous command. */
-
-  public static Command driveFoward(SwerveDrive swerve) {
-    return Commands.sequence(new TimedDrive(swerve,.5, DriveConstants.MAX_DRIVE_SPEED / 2,0, 0)); // CHANGE MADE
-  }
   
   public static Command doNothing(SwerveDrive swerve){
     return Commands.sequence(new TimedDrive(swerve, 0, 0, 0, 0));
   }
 
-  public static Command scoreMiddle(SwerveDrive swerve, Wrist wrist, Claw claw){
-    return Commands.sequence(
-      
-    new RotateToAngle(180, swerve),
-    
-    new TimedDrive(swerve,1.2, -DriveConstants.MAX_DRIVE_SPEED / 4, 0, 0),    
-
-    Commands.runOnce(() -> {claw.slowOutakeCoral();}).withTimeout(2)
-
-    );
-   
-  } 
-
    public static Command move(SwerveDrive swerve){
 
-    return AutoBuilder.pathfindToPose(new Pose2d(3,0,new Rotation2d(0)), new PathConstraints(1, 20, 1.0, 1.0));
+    return Commands.sequence(
+      
+    // Reset Odometry 
+    Commands.runOnce(() -> {swerve.resetOdometry(new Pose2d(7.18, 4.05, new Rotation2d(0)));}),
+
+    // Rotate 180
+    new RotateToAngle(180, swerve),
+
+    // Drives Forward
+    swerve.setPose2d(5.713, 4.271, 0));
      
     }
 
@@ -72,26 +64,36 @@ public final class Autos {
       
       return Commands.sequence(
 
+        // Reset Odometry
         Commands.runOnce(() -> {swerve.resetOdometry(new Pose2d(7.18, 4.05, new Rotation2d(0)));}),
       
+        // Rotate 180
         new RotateToAngle(180, swerve).withTimeout(2.5),
 
+        // Drives to Approach pose
         swerve.setPose2d(6.68, 4.05, Math.PI),
 
+        // Flashes for Camera
         Commands.runOnce(() -> {swerve.resetPoseLimelight();}),
 
+        //Adjust pose again
         swerve.setPose2d(6.68, 4.30, Math.PI),
 
+        // Takes Elevator and wrist to L4 Scoring Position
         new WristToPosition(wrist, WristPositions.TOGGLE_POSITION),
         new MoveElevatorToPosition(elevator, wrist, ElevatorHeights.HIGH_POSITION_L4),
         new WristToPosition(wrist, WristPositions.HIGH_WRIST_POSITION),
 
+        // Slowly Drives To Scorring Position 
         swerve.setSlowPose2d(5.64, 4.22, Math.PI),
 
+        // Outtakes
         new Outtake(wrist, claw).withTimeout(0.2),
 
+        // Slowly Backs up From Reef
         swerve.setSlowPose2d(6.68, 4.30, Math.PI),
 
+        // Brings Elevator and wrist back to Low Position
         new WristToPosition(wrist, WristPositions.TOGGLE_POSITION),
         new MoveElevatorToPosition(elevator, wrist, ElevatorHeights.LOW_POSITION_L1), 
         new WristToPosition(wrist, WristPositions.LOW_WRIST_POSITION)
@@ -99,7 +101,7 @@ public final class Autos {
       );
     }
 
-    public static Command leftScore(SwerveDrive swerve, Elevator elevator, Wrist wrist, Claw claw){
+    public static Command rightScore(SwerveDrive swerve, Elevator elevator, Wrist wrist, Claw claw){
       
       return Commands.sequence(
 
@@ -136,6 +138,7 @@ public final class Autos {
       //Start Position (vibed initial position just so it doesn't start out of the field)
       Commands.runOnce(() -> {swerve.resetOdometry(new Pose2d(7.18, 4.05, new Rotation2d(Math.PI)));}),
 
+      // Slightly Approaches 
       swerve.setPose2d(6.68, 4.05, Math.PI),
 
       //Gets position from limelight
@@ -233,7 +236,7 @@ public final class Autos {
       swerve.setPose2d(6.80, 4.16, Math.PI),
 
       //Gets position from limelight
-      Commands.runOnce(() -> {swerve.resetPoseLimelight();}),
+      Commands.runOnce(() -> {swerve.resetPoseLimelight();}), 
 
       //move slowly while raising arm to position
       new ParallelCommandGroup(
@@ -287,17 +290,6 @@ public final class Autos {
 
     }
 
-    public static Command forward(SwerveDrive swerve, Elevator elevator, Wrist wrist, Claw claw){
-
-      return Commands.sequence(
-
-      Commands.runOnce(() -> {swerve.resetOdometry(new Pose2d(7.18, 4.05, new Rotation2d(0)));}),
-
-      swerve.setPose2d(5.68, 4.05, 0));
-
-    }
-
-
     public static Command rightTwoPiece(SwerveDrive swerve, Elevator elevator, Wrist wrist, Claw claw){
 
       return Commands.sequence(
@@ -348,6 +340,55 @@ public final class Autos {
 
     }
 
+    public static Command leftTwopiece(SwerveDrive swerve, Elevator elevator, Wrist wrist, Claw claw){
+
+      return Commands.sequence(
+
+      Commands.runOnce(() -> {swerve.resetOdometry(new Pose2d(7.18, 2.1641, new Rotation2d(0)));}),
+
+      new RotateToAngle(-240, swerve),
+
+      swerve.setPose2d(5.807, 2.143, Units.degreesToRadians(-240)),
+
+      Commands.runOnce(() -> {swerve.resetPoseLimelight();}),
+
+      new SequentialCommandGroup(
+          new WristToPosition(wrist, WristPositions.TOGGLE_POSITION),
+          new MoveElevatorToPosition(elevator, wrist, ElevatorHeights.HIGH_POSITION_L4),
+          new WristToPosition(wrist, WristPositions.HIGH_WRIST_POSITION) 
+        ),
+
+      swerve.setSlowPose2d(4.934, 2.913, Units.degreesToRadians(-240)),
+
+      Commands.runOnce(() -> {wrist.resetEncoder();}),
+
+      new Outtake(wrist, claw).withTimeout(.3), 
+    
+      new ParallelCommandGroup( 
+
+          swerve.setSlowPose2d(5.807, 2.143, Units.degreesToRadians(-240)),
+
+      new SequentialCommandGroup(
+          new WaitCommand(1.5),
+          new WristToPosition(wrist, WristPositions.TOGGLE_POSITION),
+          new MoveElevatorToPosition(elevator, wrist, ElevatorHeights.LOW_POSITION_L1), 
+          new WristToPosition(wrist, WristPositions.LOW_WRIST_POSITION))
+
+    ),
+
+    swerve.setPose2d(2.988, 1.9667, Units.degreesToRadians(-240)),
+
+    Commands.runOnce(() -> {swerve.resetPoseLimelight();}),
+
+     swerve.setPose2d(.6, 1.2, Units.degreesToRadians(-312)),
+      
+     new Intake(claw, wrist).until(() -> claw.hasCoral()),
+     
+     swerve.setPose2d(3.02, 2.358, Units.degreesToRadians(-312)),
+
+     swerve.setPose2d(3.65, 3.044, Units.degreesToRadians(-312)));
+
+    }
 
   private Autos() {
     throw new UnsupportedOperationException("This is a utility class!");
