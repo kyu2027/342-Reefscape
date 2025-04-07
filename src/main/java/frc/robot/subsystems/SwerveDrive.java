@@ -296,6 +296,10 @@ public class SwerveDrive extends SubsystemBase {
       return AutoBuilder.pathfindToPose(pose.getPose2d(redSide), DriveConstants.CONSTRAINTS);
     }
 
+    public Command setSlowPose2d(AutoConstants.FieldPoses pose){
+      return AutoBuilder.pathfindToPose(pose.getPose2d(redSide), DriveConstants.SLOW_CONSTRAINTS);
+    }
+
     public void resetOdometry(Pose2d pose){
        odometry.resetPosition(NavX.getRotation2d(), getCurrentSwerveModulePositions(), pose);
     }

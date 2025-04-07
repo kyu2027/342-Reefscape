@@ -243,12 +243,12 @@ public final class Constants {
         new Pose2d(1,1,new Rotation2d(0))),  // Start : Blue 
 
       MIDDLE_APPROACH_POSE (
-        new Pose2d(1,2, new Rotation2d(0)), // Approach : Red
-        new Pose2d(1,1,new Rotation2d(0))), // Approach : Blue
+        new Pose2d(6.41, 3.898, new Rotation2d(Math.PI)), // Approach : Red
+        new Pose2d(6.305,3.875,new Rotation2d(Math.PI))), // Approach : Blue
 
       MIDDLE_SCORE_POSE (
-        new Pose2d(1,2, new Rotation2d(0)), // Score : Red
-        new Pose2d(1,1,new Rotation2d(0))), // Score : Blue
+        new Pose2d(5.445,3.898, new Rotation2d(Math.PI)), // Score : Red
+        new Pose2d(5.464, 3.875,new Rotation2d(Math.PI))), // Score : Blue
 
       // Left Pose
       LEFT_START_POSE (
@@ -278,8 +278,19 @@ public final class Constants {
 
       CORAL_STATION_RIGH_POSE(
         new Pose2d(1.439,0.836, new Rotation2d(-312)), //Red
-        new Pose2d(1.439,0.836, new Rotation2d(0))  //Blue
-      );
+        new Pose2d(1.439,0.836, new Rotation2d(Units.degreesToRadians(-312)))  //Blue
+      ),
+      
+      CORAL_STATION_RIGHT_APPROACH(
+        new Pose2d(3.308, 2.367, new Rotation2d(Units.degreesToRadians(70))), //Red
+        new Pose2d(3.308, 2.367, new Rotation2d(Units.degreesToRadians(70)))),  //Blue
+
+
+      SECOND_PIECE_SCORE(
+          new Pose2d(3.308, 2.367, new Rotation2d(Units.degreesToRadians(70))), //Red
+          new Pose2d(3.716,3.014, new Rotation2d(Units.degreesToRadians(-312))))  //Blue
+      
+      ;
 
       private Pose2d redSide;
       private Pose2d blueSide;

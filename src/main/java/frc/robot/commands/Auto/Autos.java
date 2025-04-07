@@ -71,27 +71,29 @@ public final class Autos {
         new RotateToAngle(180, swerve).withTimeout(2.5),
 
         // Drives to Approach pose
-        swerve.setPose2d(6.68, 4.05, Math.PI),
+        swerve.setPose2d(6.68, 4.30, Math.PI),  // MIDDLE APPROACH  //6.68, 4.05, Math.PI
 
         // Flashes for Camera
         Commands.runOnce(() -> {swerve.resetPoseLimelight();}),
 
         //Adjust pose again
-        swerve.setPose2d(6.68, 4.30, Math.PI),
+        swerve.setPose2d(FieldPoses.MIDDLE_APPROACH_POSE),
 
         // Takes Elevator and wrist to L4 Scoring Position
         new WristToPosition(wrist, WristPositions.TOGGLE_POSITION),
         new MoveElevatorToPosition(elevator, wrist, ElevatorHeights.HIGH_POSITION_L4),
         new WristToPosition(wrist, WristPositions.HIGH_WRIST_POSITION),
 
+        Commands.runOnce(() -> {wrist.resetEncoder();}),
+
         // Slowly Drives To Scorring Position 
-        swerve.setSlowPose2d(5.64, 4.22, Math.PI),
+        swerve.setSlowPose2d(FieldPoses.MIDDLE_SCORE_POSE),  // MIDDLE SCORE //5.64, 4.22, Math.PI
 
         // Outtakes
-        new Outtake(wrist, claw).withTimeout(0.2),
+        new Outtake(wrist, claw).withTimeout(0.3),
 
         // Slowly Backs up From Reef
-        swerve.setSlowPose2d(6.68, 4.30, Math.PI),
+        swerve.setSlowPose2d(FieldPoses.MIDDLE_APPROACH_POSE),
 
         // Brings Elevator and wrist back to Low Position
         new WristToPosition(wrist, WristPositions.TOGGLE_POSITION),
@@ -100,7 +102,7 @@ public final class Autos {
 
       );
     }
-
+/* 
     public static Command rightScore(SwerveDrive swerve, Elevator elevator, Wrist wrist, Claw claw){
       
       return Commands.sequence(
@@ -130,6 +132,7 @@ public final class Autos {
       );
        
     }
+    */
 
     public static Command twoPieceMiddle(SwerveDrive swerve, Elevator elevator, Wrist wrist, Claw claw){
 
@@ -161,7 +164,7 @@ public final class Autos {
       Commands.runOnce(() -> {swerve.resetPoseLimelight();}),
 
       //Go to scoring position
-      swerve.setSlowPose2d(5.713, 4.271, Math.PI),
+      swerve.setSlowPose2d(FieldPoses.MIDDLE_SCORE_POSE),
      
       //Drop off
       new Outtake(wrist, claw).withTimeout(.3),
@@ -169,7 +172,7 @@ public final class Autos {
       //Backs us up while bringing elevator down
       new ParallelCommandGroup(
         
-        swerve.setSlowPose2d(6.68, 4.30, Math.PI),
+        swerve.setSlowPose2d(6.68, 4.30, Math.PI), // APPROACH //6.68, 4.30
 
         new SequentialCommandGroup(
           new WaitCommand(.5),
@@ -183,7 +186,7 @@ public final class Autos {
       new ParallelCommandGroup(
         new WristToPosition(wrist, WristPositions.LOW_WRIST_POSITION),
         Commands.runOnce(() -> {wrist.resetEncoder();}),
-        swerve.setPose2d(1.5, 2.2, Units.degreesToRadians(70))),
+        swerve.setPose2d(FieldPoses.CORAL_STATION_RIGHT_APPROACH)),
 
       //Grab position from limelight
       Commands.runOnce(() -> {swerve.resetPoseLimelight();}),
@@ -200,26 +203,21 @@ public final class Autos {
 
       //Drive to safe position while putting elevator up
 
-      new ParallelCommandGroup(
-
         //Drive to scoring position
         
-      swerve.setSlowPose2d(4.048, 3.017, Units.degreesToRadians(-312)),
+      swerve.setSlowPose2d(4.048, 3.017, Units.degreesToRadians(-312)));
       
       
-      new SequentialCommandGroup(
-          new WristToPosition(wrist, WristPositions.TOGGLE_POSITION),
-          new MoveElevatorToPosition(elevator, wrist, ElevatorHeights.HIGH_POSITION_L4),
-          new WristToPosition(wrist, WristPositions.HIGH_WRIST_POSITION)
-        )
+     /// new SequentialCommandGroup(
+        //  new WristToPosition(wrist, WristPositions.TOGGLE_POSITION),
+         // new MoveElevatorToPosition(elevator, wrist, ElevatorHeights.HIGH_POSITION_L4),
+         // new WristToPosition(wrist, WristPositions.HIGH_WRIST_POSITION)
+      //  )
 
-      ),
+     // ),
 
       //Score
-      new Outtake(wrist, claw).withTimeout(.2)
-
-        
-       );
+      //new Outtake(wrist, claw).withTimeout(.2)
 
     }
 
@@ -241,7 +239,7 @@ public final class Autos {
       //move slowly while raising arm to position
       new ParallelCommandGroup(
      
-        swerve.setSlowPose2d(6.80, 4.16,  Math.PI),
+        swerve.setSlowPose2d(FieldPoses.MIDDLE_APPROACH_POSE),
 
         Commands.runOnce(() -> {swerve.resetPoseLimelight();}),
 
@@ -255,7 +253,7 @@ public final class Autos {
       Commands.runOnce(() -> {swerve.resetPoseLimelight();}),
 
       //Go to scoring position
-      swerve.setSlowPose2d(5.56, 4.38,  Math.PI),
+      swerve.setSlowPose2d(FieldPoses.MIDDLE_SCORE_POSE),
      
       //Drop off
       new Outtake(wrist, claw).withTimeout(.2),
@@ -263,7 +261,7 @@ public final class Autos {
       //Backs us up while bringing elevator down
       new ParallelCommandGroup(
         
-        swerve.setSlowPose2d(6.68, 4.30,  Math.PI),
+        swerve.setSlowPose2d(FieldPoses.MIDDLE_APPROACH_POSE),
 
         new SequentialCommandGroup(
           new WaitCommand(.5),
@@ -283,7 +281,7 @@ public final class Autos {
       Commands.runOnce(() -> {swerve.resetPoseLimelight();}),
 
       //drive to coral station
-      swerve.setPose2d(.6, 1.2, Units.degreesToRadians(-312)),
+      swerve.setPose2d(FieldPoses.CORAL_STATION_RIGH_POSE),
       
       //intake
       new Intake(claw, wrist));

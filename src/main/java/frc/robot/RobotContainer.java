@@ -244,11 +244,11 @@ public class RobotContainer {
     autoChooser.addOption("Do Nothing", Autos.doNothing(swerve));
 
     autoChooser.addOption("Pose Drive", Autos.move(swerve));
-    //autoChooser.addOption("score", Autos.middleScore(swerve, elevator, wrist, claw));
+    autoChooser.addOption("Single Middle", Autos.middleScore(swerve, elevator, wrist, claw));
     //autoChooser.addOption("Left Auto", Autos.leftScore(swerve, elevator, wrist, claw));
 
     autoChooser.addOption("Two Piece Sketch", Autos.twoPieceMiddle(swerve, elevator, wrist, claw));
-    autoChooser.addOption("One Piece and Load", Autos.singleLoad(swerve, elevator, wrist, claw));
+    autoChooser.addOption("Single and Load", Autos.singleLoad(swerve, elevator, wrist, claw));
     autoChooser.addOption("Two piece Right", Autos.rightTwoPiece(swerve, elevator, wrist, claw));
 
     //autoChooser.addOption("Test PATHPLANNER", new PathPlannerAuto("Test Auto"));
