@@ -6,22 +6,19 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static frc.robot.Constants.ElevatorConstants.*;
-import static frc.robot.Constants.WristConstants.THROUGHBORE_PORT;
 
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.config.MAXMotionConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.MAXMotionConfig.MAXMotionPositionMode;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkClosedLoopController;
 import edu.wpi.first.util.sendable.SendableBuilder;
-import au.grapplerobotics.LaserCan;
-import au.grapplerobotics.interfaces.LaserCanInterface.Measurement;
 
 public class Elevator extends SubsystemBase {
 
@@ -41,9 +38,6 @@ public class Elevator extends SubsystemBase {
 
   private SparkMaxConfig elevatorLeftMotorConfig;
   private SparkMaxConfig elevatorRightMotorConfig;
-  //private MAXMotionConfig elevatorPIDConfig;
-
-  private LaserCan elevatorLaserCan;
 
   /** Creates a new Elevator. */
   public Elevator() {
@@ -58,29 +52,7 @@ public class Elevator extends SubsystemBase {
 
     //elevatorPIDConfig = new MAXMotionConfig();
 
-    /*
-     * Configure the LaserCAN using the GrappleHook app as some of the code throws a 
-     * ConfigurationFailedException error. Short ranging mode is ideal due to less 
-     * interference from ambient light, but it only goes up to 1.3 meters while Long 
-     * ranging mode goes up to 4 meters.
-     */
-    elevatorLaserCan = new LaserCan(LASERCAN_ID);
-
     elevatorLeftMotorConfig = new SparkMaxConfig();
-
-    elevatorLeftMotorConfig
-      .idleMode(IdleMode.kBrake)
-      .smartCurrentLimit(60)
-      .follow(elevatorRightMotor, true);
-
-    /*
-     * kResetSafeParameters resets all safe writable parameters before applying the
-     * given configurations. Setting this to kNoResetSafeParameters will skip this step.
-     * kPersistParameters saves all parameters to the SPARK's non-volatile memory. Setting this
-     * to kNoPersistParameters will skip this step.
-     */
-    elevatorLeftMotor.configure(elevatorLeftMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-
     elevatorRightMotorConfig = new SparkMaxConfig();
 
     elevatorRightMotorConfig
@@ -90,50 +62,45 @@ public class Elevator extends SubsystemBase {
   
     elevatorEncoder = elevatorRightMotor.getEncoder();
 
+
+    elevatorRightMotorConfig.encoder
+      .positionConversionFactor(ELEVATOR_POSITION_CONVERSION_FACTOR)
+      .velocityConversionFactor(ELEVATOR_VELOCITY_CONVERSION_FACTOR);
+
     //PID values are still being tuned, but these values do work
     elevatorRightMotorConfig.closedLoop
-      .pid(0.005, 0, 0.0015)
-      .outputRange(-.5, 1);
-    // elevatorRightMotorConfig.closedLoop.maxMotion.maxAcceleration(2);
-    // elevatorRightMotorConfig.closedLoop.maxMotion.maxVelocity(10);
-    // elevatorRightMotorConfig.closedLoop.maxMotion.allowedClosedLoopError(10);
-    
-    elevatorRightMotorConfig.encoder
-      .positionConversionFactor(ELEVATOR_CONVERSION_FACTOR);
-      
+      .pid(0.005, 0, 0.0015, ClosedLoopSlot.kSlot0)
+      .outputRange(-0.5, 1, ClosedLoopSlot.kSlot0);
 
+    elevatorRightMotorConfig.closedLoop.maxMotion
+      .maxAcceleration(ELEVATOR_MAX_ACCELERATION, ClosedLoopSlot.kSlot0)
+      .maxVelocity(ELEVATOR_MAX_VELOCITY, ClosedLoopSlot.kSlot0)      
+      .allowedClosedLoopError(ELEVATOR_ALLOWED_ERROR, ClosedLoopSlot.kSlot0)
+      .positionMode(MAXMotionPositionMode.kMAXMotionTrapezoidal, ClosedLoopSlot.kSlot0);
+
+    elevatorLeftMotorConfig
+      .apply(elevatorRightMotorConfig)
+      .follow(elevatorRightMotor, true);
+
+    /*
+     * kResetSafeParameters resets all safe writable parameters before applying the
+     * given configurations. Setting this to kNoResetSafeParameters will skip this step.
+     * kPersistParameters saves all parameters to the SPARK's non-volatile memory. Setting this
+     * to kNoPersistParameters will skip this step.
+     */
     elevatorRightMotor.configure(elevatorRightMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    elevatorLeftMotor.configure(elevatorLeftMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
 
-    elevatorEncoder.setPosition(getLaserCanReading());
+    resetElevator();
     currentPosition = elevatorEncoder.getPosition();
 
-  }
-
-  //Returns the reading of the laserCAN in millimeters
-  public int getLaserCanReading() {
-    Measurement measurement = elevatorLaserCan.getMeasurement();
-    if(measurement != null) {
-      return measurement.distance_mm;
-    }else{
-      return 0;
-    }
-    //return elevatorLaserCan.getMeasurement().distance_mm;
   }
 
   //Returns the reading of the relative encoder
   public double getEncoderPosition() {
     return elevatorEncoder.getPosition();
   }
-
-  /*
-   * The method below has been commented out because it is unlikely to be used
-   */
-  // //Returns true if an object is _ millimeters to the bottom of the elevator;
-  // public boolean objectTooClose() {
-  //   //Placeholder values, change after figuring out how close the elevator is to the ground
-  //   return getLaserCanReading() == 0;
-  // }
 
   //Moves the elevator to the given position
   public void ElevatorToPosition(double nextPosition) {
@@ -146,7 +113,7 @@ public class Elevator extends SubsystemBase {
     if(goingDown && tooLow || !goingDown && tooHigh)
       stop();
     else {
-      elevatorPID.setReference(nextPosition, ControlType.kPosition);
+      elevatorPID.setReference(nextPosition, ControlType.kMAXMotionPositionControl, ClosedLoopSlot.kSlot0);
       currentPosition = nextPosition;
     }
 
@@ -168,18 +135,13 @@ public class Elevator extends SubsystemBase {
     elevatorRightMotor.stopMotor();
   }
 
-  //Sets the encoder position to the laserCAN position
-  public void resetEncoder() {
-    elevatorEncoder.setPosition((double) (getLaserCanReading()));
-  }
-
   //Holds the current position
   public void holdPosition() {
     elevatorPID.setReference(currentPosition, ControlType.kPosition);
   }
 
   public void isAtPosition(double nextPosition) {
-    atPosition = Math.abs(getEncoderPosition() - nextPosition) < ELEVATOR_ERROR;
+    atPosition = Math.abs(getEncoderPosition() - nextPosition) < ELEVATOR_ALLOWED_ERROR;
   }
 
   public void resetElevator(){
@@ -201,9 +163,8 @@ public class Elevator extends SubsystemBase {
     builder.setSmartDashboardType("Elevator");
 
     //Data being put on Elastic for debugging purposes
-    builder.addDoubleProperty("LaserCAN Reading", () -> getLaserCanReading(), null);
     builder.addDoubleProperty("Relative Encoder Reading", () -> getEncoderPosition(), null);
-    builder.addDoubleProperty("Elevator Error", () -> ((double) (getLaserCanReading())) - getEncoderPosition(), null);
+    builder.addDoubleProperty("Elevator Velocity", () -> elevatorEncoder.getVelocity(), null);
   }
 
 }
