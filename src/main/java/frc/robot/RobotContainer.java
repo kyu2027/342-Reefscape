@@ -162,7 +162,7 @@ public class RobotContainer {
     slowOuttake = Commands.startEnd(() -> {claw.slowOutakeCoral();}, () -> {claw.spin(0);}, claw);
 
     resetEncoder = Commands.runOnce(() -> {wrist.resetEncoder();});
-    resetElevator = Commands.runOnce(() -> {elevator.resetEncoder();});
+    resetElevator = Commands.runOnce(() -> {elevator.resetElevator();});
 
     intake = new Intake(claw, wrist);
     outtake = new Outtake(wrist, claw);

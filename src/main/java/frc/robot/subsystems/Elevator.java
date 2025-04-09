@@ -6,33 +6,30 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static frc.robot.Constants.ElevatorConstants.*;
-import static frc.robot.Constants.WristConstants.THROUGHBORE_PORT;
 
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.config.MAXMotionConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
-import com.revrobotics.spark.config.MAXMotionConfig.MAXMotionPositionMode;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.spark.SparkClosedLoopController;
 import edu.wpi.first.util.sendable.SendableBuilder;
-import au.grapplerobotics.LaserCan;
-import au.grapplerobotics.interfaces.LaserCanInterface.Measurement;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.controller.ElevatorFeedforward;
 
 public class Elevator extends SubsystemBase {
 
-  private SparkClosedLoopController elevatorPID;
+  private ProfiledPIDController elevatorPID;
+  private ElevatorFeedforward elevatorFeedforward;
 
   private boolean goingDown;
   private boolean tooLow;
   private boolean tooHigh;
   private boolean atPosition;
 
-  private double currentPosition;
+  private double pidOutput;
+  private double elevatorFF;
 
   private SparkMax elevatorLeftMotor;
   private SparkMax elevatorRightMotor;
@@ -41,9 +38,6 @@ public class Elevator extends SubsystemBase {
 
   private SparkMaxConfig elevatorLeftMotorConfig;
   private SparkMaxConfig elevatorRightMotorConfig;
-  //private MAXMotionConfig elevatorPIDConfig;
-
-  private LaserCan elevatorLaserCan;
 
   /** Creates a new Elevator. */
   public Elevator() {
@@ -54,17 +48,10 @@ public class Elevator extends SubsystemBase {
     elevatorLeftMotor = new SparkMax(ELEVATORLEFT_ID, MotorType.kBrushless);
     elevatorRightMotor = new SparkMax(ELEVATORRIGHT_ID, MotorType.kBrushless);
 
-    elevatorPID = elevatorRightMotor.getClosedLoopController();
+    elevatorPID = new ProfiledPIDController(ELEVATOR_P, ELEVATOR_I, ELEVATOR_D, ELEVATOR_CONSTRAINTS);
+    elevatorFeedforward = new ElevatorFeedforward(ELEVATOR_KS, ELEVATOR_KG, ELEVATOR_KV);
 
-    //elevatorPIDConfig = new MAXMotionConfig();
-
-    /*
-     * Configure the LaserCAN using the GrappleHook app as some of the code throws a 
-     * ConfigurationFailedException error. Short ranging mode is ideal due to less 
-     * interference from ambient light, but it only goes up to 1.3 meters while Long 
-     * ranging mode goes up to 4 meters.
-     */
-    elevatorLaserCan = new LaserCan(LASERCAN_ID);
+    elevatorFF = elevatorFeedforward.calculate(ELEVATOR_MAX_VELOCITY, ELEVATOR_MAX_ACCELERATION);
 
     elevatorLeftMotorConfig = new SparkMaxConfig();
 
@@ -89,14 +76,6 @@ public class Elevator extends SubsystemBase {
       .smartCurrentLimit(60);
   
     elevatorEncoder = elevatorRightMotor.getEncoder();
-
-    //PID values are still being tuned, but these values do work
-    elevatorRightMotorConfig.closedLoop
-      .pid(0.005, 0, 0.0015)
-      .outputRange(-.5, 1);
-    // elevatorRightMotorConfig.closedLoop.maxMotion.maxAcceleration(2);
-    // elevatorRightMotorConfig.closedLoop.maxMotion.maxVelocity(10);
-    // elevatorRightMotorConfig.closedLoop.maxMotion.allowedClosedLoopError(10);
     
     elevatorRightMotorConfig.encoder
       .positionConversionFactor(ELEVATOR_CONVERSION_FACTOR);
@@ -105,25 +84,21 @@ public class Elevator extends SubsystemBase {
     elevatorRightMotor.configure(elevatorRightMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
 
-    elevatorEncoder.setPosition(getLaserCanReading());
-    currentPosition = elevatorEncoder.getPosition();
+    resetElevator();
 
-  }
-
-  //Returns the reading of the laserCAN in millimeters
-  public int getLaserCanReading() {
-    Measurement measurement = elevatorLaserCan.getMeasurement();
-    if(measurement != null) {
-      return measurement.distance_mm;
-    }else{
-      return 0;
-    }
-    //return elevatorLaserCan.getMeasurement().distance_mm;
   }
 
   //Returns the reading of the relative encoder
   public double getEncoderPosition() {
     return elevatorEncoder.getPosition();
+  }
+
+  public double getElevatorVelocity() {
+    return elevatorEncoder.getVelocity();
+  }
+
+  public double getElevatorVoltage() {
+    return elevatorRightMotor.getBusVoltage();
   }
 
   /*
@@ -139,15 +114,15 @@ public class Elevator extends SubsystemBase {
   public void ElevatorToPosition(double nextPosition) {
     atPosition = false;
 
-    goingDown = currentPosition > nextPosition;
+    goingDown = getEncoderPosition() > nextPosition;
     tooLow = elevatorEncoder.getPosition() < BOTTOM_POSITION;
     tooHigh = elevatorEncoder.getPosition() > TOP_POSITION;
 
     if(goingDown && tooLow || !goingDown && tooHigh)
       stop();
     else {
-      elevatorPID.setReference(nextPosition, ControlType.kPosition);
-      currentPosition = nextPosition;
+      pidOutput = elevatorPID.calculate(getEncoderPosition(), nextPosition);
+      elevatorRightMotor.setVoltage(pidOutput + elevatorFF);
     }
 
     isAtPosition(nextPosition);
@@ -157,9 +132,8 @@ public class Elevator extends SubsystemBase {
   public void moveElevator(double speed) {
     if(Math.abs(speed) > 0.05) {
       elevatorRightMotor.set(speed);
-      currentPosition = getEncoderPosition();
     }else{
-      holdPosition();
+      holdPosition(getEncoderPosition());
     }
   }
 
@@ -168,20 +142,18 @@ public class Elevator extends SubsystemBase {
     elevatorRightMotor.stopMotor();
   }
 
-  //Sets the encoder position to the laserCAN position
-  public void resetEncoder() {
-    elevatorEncoder.setPosition((double) (getLaserCanReading()));
-  }
-
   //Holds the current position
-  public void holdPosition() {
-    elevatorPID.setReference(currentPosition, ControlType.kPosition);
+  public void holdPosition(double position) {
+    pidOutput = elevatorPID.calculate(getEncoderPosition(), position);
+    elevatorRightMotor.setVoltage(pidOutput + elevatorFF);
   }
 
+  //Checks if the elevator has reached the position with a margin of 10 mm
   public void isAtPosition(double nextPosition) {
     atPosition = Math.abs(getEncoderPosition() - nextPosition) < ELEVATOR_ERROR;
   }
 
+  //Resets elevator to starting position
   public void resetElevator(){
     elevatorEncoder.setPosition(0);
   }
@@ -190,7 +162,7 @@ public class Elevator extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     if(atPosition) {
-      holdPosition();
+      holdPosition(getEncoderPosition());
     }
   }
 
@@ -201,9 +173,9 @@ public class Elevator extends SubsystemBase {
     builder.setSmartDashboardType("Elevator");
 
     //Data being put on Elastic for debugging purposes
-    builder.addDoubleProperty("LaserCAN Reading", () -> getLaserCanReading(), null);
     builder.addDoubleProperty("Relative Encoder Reading", () -> getEncoderPosition(), null);
-    builder.addDoubleProperty("Elevator Error", () -> ((double) (getLaserCanReading())) - getEncoderPosition(), null);
+    builder.addDoubleProperty("Elevator Velocity", () -> getElevatorVelocity(), null);
+    builder.addDoubleProperty("Elevator Voltage", () -> getElevatorVoltage(), null);
   }
 
 }
