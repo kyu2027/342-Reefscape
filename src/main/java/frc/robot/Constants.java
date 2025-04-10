@@ -140,6 +140,7 @@ public final class Constants {
     public static final double ELEVATOR_KS = 0.0; //In volts; what voltage is required to overcome initial energy needed to move elevator
     public static final double ELEVATOR_KG = 0.08; //In volts; what voltage is required to counteract gravity
     public static final double ELEVATOR_KV = 11.669; //Volts/(m/s); what voltage is needed to hold a constant velocity
+    public static final double ELEVATOR_KA = 0.01; //Volts/(m/s^2); what voltage is needed to get to max acceleration; kA is low because our elevator is low inertia mechanism
 
 
 
