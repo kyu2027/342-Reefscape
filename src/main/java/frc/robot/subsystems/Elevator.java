@@ -49,7 +49,7 @@ public class Elevator extends SubsystemBase {
     elevatorRightMotor = new SparkMax(ELEVATORRIGHT_ID, MotorType.kBrushless);
 
     elevatorPID = new ProfiledPIDController(ELEVATOR_P, ELEVATOR_I, ELEVATOR_D, ELEVATOR_CONSTRAINTS);
-    elevatorFeedforward = new ElevatorFeedforward(ELEVATOR_KS, ELEVATOR_KG, ELEVATOR_KV);
+    elevatorFeedforward = new ElevatorFeedforward(ELEVATOR_KS, ELEVATOR_KG, ELEVATOR_KV, ELEVATOR_KA);
 
     elevatorFF = elevatorFeedforward.calculate(ELEVATOR_MAX_VELOCITY, ELEVATOR_MAX_ACCELERATION);
 
