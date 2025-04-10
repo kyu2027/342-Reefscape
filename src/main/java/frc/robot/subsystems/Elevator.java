@@ -101,6 +101,10 @@ public class Elevator extends SubsystemBase {
     return elevatorRightMotor.getBusVoltage();
   }
 
+  public double getElevatorOutput() {
+    return pidOutput + elevatorFF;
+  }
+
   /*
    * The method below has been commented out because it is unlikely to be used
    */
@@ -173,9 +177,10 @@ public class Elevator extends SubsystemBase {
     builder.setSmartDashboardType("Elevator");
 
     //Data being put on Elastic for debugging purposes
-    builder.addDoubleProperty("Relative Encoder Reading", () -> getEncoderPosition(), null);
+    builder.addDoubleProperty("Elevator Position", () -> getEncoderPosition(), null);
     builder.addDoubleProperty("Elevator Velocity", () -> getElevatorVelocity(), null);
     builder.addDoubleProperty("Elevator Voltage", () -> getElevatorVoltage(), null);
+    builder.addDoubleProperty("Elevator Output", () -> getElevatorOutput(), null);
   }
 
 }
