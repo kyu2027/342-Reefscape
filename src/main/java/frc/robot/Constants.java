@@ -308,6 +308,23 @@ public final class Constants {
    
   }
 
+  public static class ClimbConstants {
+    public static final int CLIMB_ID = 14;
+    public static final int FUNNEL_ID = 12;
+    public static final int FUNNEL_DUTY_ID = 9;
 
+    public static final double CLIMB_UP = 240; //TODO
+    //replace with accurate values TODO
+    public static final double FUNNEL_UP = -33;
+    public static final double FUNNEL_DOWN = 0;
 
+    public static final double FUNNEL_P = 0.1;
+    public static final double FUNNEL_I = 0.00;
+    public static final double FUNNEL_D = 0.08;
+    public static final double CLIMB_P = 0.1;
+    
+    public static final double CLIMB_I = 0.0;
+    public static final double CLIMB_D = 0.1;
+
+  }
 }
