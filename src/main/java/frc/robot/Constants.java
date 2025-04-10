@@ -136,19 +136,12 @@ public final class Constants {
     public static final double ELEVATOR_P = 0.005;
     public static final double ELEVATOR_I = 0.0;
     public static final double ELEVATOR_D = 0.0015;
-    
-    public static final double ELEVATOR_KS = 0.0; //In volts; what voltage is required to overcome initial energy needed to move elevator
-    public static final double ELEVATOR_KG = 0.08; //In volts; what voltage is required to counteract gravity
-    public static final double ELEVATOR_KV = 11.669; //Volts/(m/s); what voltage is needed to hold a constant velocity
-    public static final double ELEVATOR_KA = 0.01; //Volts/(m/s^2); what voltage is needed to get to max acceleration; kA is low because our elevator is low inertia mechanism
 
-
-
-    public static final double ELEVATOR_CONVERSION_FACTOR = (.1397 * 2) / 9; //Converts the encoder to meters
+    public static final double ELEVATOR_CONVERSION_FACTOR = (139.7 * 2) / 9; //Converts the encoder to meters
 
     public static final double BOTTOM_POSITION = 0.0;
-    public static final double TOP_POSITION = 1.500;
-    public static final double ELEVATOR_ERROR = 0.005;
+    public static final double TOP_POSITION = 1500;
+    public static final double ELEVATOR_ERROR = 5;
 
     /*
      * Still tuning values for positions because
@@ -157,13 +150,13 @@ public final class Constants {
      * the numbers on the right is what the laserCAN reads.
      */
     public static final double L1_HEIGHT = 0.0;
-    public static final double L2_HEIGHT = 0.242 /**300.0*/;
-    public static final double L3_HEIGHT = 0.645 /**485.0*/;
-    public static final double L4_HEIGHT = 1.384 /**850.0*/;
-    public static final double PROCESSOR_HEIGHT = 0.036;
+    public static final double L2_HEIGHT = 242 /**300.0*/;
+    public static final double L3_HEIGHT = 645 /**485.0*/;
+    public static final double L4_HEIGHT = 1384 /**850.0*/;
+    public static final double PROCESSOR_HEIGHT = 36;
 
-    public static final double ALGAE_LOW_HEIGHT = 0.462;
-    public static final double ALGAE_HIGH_HEIGHT = 0.885;
+    public static final double ALGAE_LOW_HEIGHT = 462;
+    public static final double ALGAE_HIGH_HEIGHT = 885;
 
   }
 

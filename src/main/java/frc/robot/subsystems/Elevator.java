@@ -16,12 +16,11 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.controller.ElevatorFeedforward;
+import edu.wpi.first.math.MathUtil;
 
 public class Elevator extends SubsystemBase {
 
   private ProfiledPIDController elevatorPID;
-  private ElevatorFeedforward elevatorFeedforward;
 
   private boolean goingDown;
   private boolean tooLow;
@@ -29,7 +28,6 @@ public class Elevator extends SubsystemBase {
   private boolean atPosition;
 
   private double pidOutput;
-  private double elevatorFF;
 
   private SparkMax elevatorLeftMotor;
   private SparkMax elevatorRightMotor;
@@ -49,9 +47,6 @@ public class Elevator extends SubsystemBase {
     elevatorRightMotor = new SparkMax(ELEVATORRIGHT_ID, MotorType.kBrushless);
 
     elevatorPID = new ProfiledPIDController(ELEVATOR_P, ELEVATOR_I, ELEVATOR_D, ELEVATOR_CONSTRAINTS);
-    elevatorFeedforward = new ElevatorFeedforward(ELEVATOR_KS, ELEVATOR_KG, ELEVATOR_KV, ELEVATOR_KA);
-
-    elevatorFF = elevatorFeedforward.calculate(ELEVATOR_MAX_VELOCITY, ELEVATOR_MAX_ACCELERATION);
 
     elevatorLeftMotorConfig = new SparkMaxConfig();
 
@@ -102,7 +97,7 @@ public class Elevator extends SubsystemBase {
   }
 
   public double getElevatorOutput() {
-    return pidOutput + elevatorFF;
+    return pidOutput;
   }
 
   /*
@@ -126,7 +121,7 @@ public class Elevator extends SubsystemBase {
       stop();
     else {
       pidOutput = elevatorPID.calculate(getEncoderPosition(), nextPosition);
-      elevatorRightMotor.setVoltage(pidOutput + elevatorFF);
+      elevatorRightMotor.set(pidOutput);
     }
 
     isAtPosition(nextPosition);
@@ -148,8 +143,8 @@ public class Elevator extends SubsystemBase {
 
   //Holds the current position
   public void holdPosition(double position) {
-    pidOutput = elevatorPID.calculate(getEncoderPosition(), position);
-    elevatorRightMotor.setVoltage(pidOutput + elevatorFF);
+    pidOutput = MathUtil.clamp(elevatorPID.calculate(getEncoderPosition(), position), -1, 1);
+    elevatorRightMotor.set(pidOutput);
   }
 
   //Checks if the elevator has reached the position with a margin of 10 mm
