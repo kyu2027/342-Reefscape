@@ -60,9 +60,9 @@ public class RotateToAngle extends Command {
 
     rotateController.setSetpoint(end);
 
-    current = -swerve.getGyro().getAngle();
+    current = swerve.getPiegon().getAngle(); //NAVX WAS HERE
 
-    double rotationSpeed = rotateController.calculate(current, end);
+    double rotationSpeed = -rotateController.calculate(current, end);
 
     ChassisSpeeds rotations = new ChassisSpeeds(0,0,rotationSpeed);
 

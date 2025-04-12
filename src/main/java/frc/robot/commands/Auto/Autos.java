@@ -13,6 +13,7 @@ import frc.robot.commands.Claw.Intake;
 import frc.robot.commands.Claw.Outtake;
 import frc.robot.commands.Elevator.MoveElevatorToPosition;
 import frc.robot.commands.Limelight.AutoAlign;
+import frc.robot.commands.Limelight.CamCheck;
 import frc.robot.commands.Wrist.WristToPosition;
 import frc.robot.subsystems.Claw;
 import frc.robot.subsystems.Elevator;
@@ -26,6 +27,7 @@ import static frc.robot.Constants.ElevatorConstants.L4_HEIGHT;
 import org.opencv.core.Mat;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathConstraints;
 
 import edu.wpi.first.math.MathUtil;
@@ -50,13 +52,12 @@ public final class Autos {
     return Commands.sequence(
       
     // Reset Odometry 
-    Commands.runOnce(() -> {swerve.resetOdometry(new Pose2d(7.18, 4.05, new Rotation2d(0)));}),
+    Commands.runOnce(() -> {swerve.resetOdometry(new Pose2d(7.678, 3.995, new Rotation2d(Math.PI)));}),
 
-    // Rotate 180
-    new RotateToAngle(180, swerve),
+    new CamCheck(swerve),
 
     // Drives Forward
-    swerve.setPose2d(5.713, 4.271, 0));
+    swerve.setPose2d(6.371, 3.995, 180));
      
     }
 
@@ -64,33 +65,44 @@ public final class Autos {
       
       return Commands.sequence(
 
-        // Reset Odometry
-        Commands.runOnce(() -> {swerve.resetOdometry(new Pose2d(7.18, 4.05, new Rotation2d(0)));}),
+        Commands.runOnce(() -> {swerve.getPiegon().setYaw(180);}),
+        Commands.runOnce(() -> System.out.println("Reset Gyro")),
       
-        // Rotate 180
-        new RotateToAngle(180, swerve).withTimeout(2.5),
-
+        // Reset Odometry
+        Commands.runOnce(() -> {swerve.resetOdometry(new Pose2d(7.18, 3.92, new Rotation2d(Math.PI)));}),
+        Commands.runOnce(() -> System.out.println("Reset Odometry")),
+  
         // Drives to Approach pose
-        swerve.setPose2d(6.68, 4.30, Math.PI),  // MIDDLE APPROACH  //6.68, 4.05, Math.PI
+        swerve.setPose2d(6.68, 3.864, 180),  // MIDDLE APPROACH  //6.68, 4.05, Math.PI
+        Commands.runOnce(() -> System.out.println("First Apporach")),
 
         // Flashes for Camera
-        Commands.runOnce(() -> {swerve.resetPoseLimelight();}),
+        new CamCheck(swerve),
+        Commands.runOnce(() -> System.out.println("Camera Check")),
 
         //Adjust pose again
         swerve.setPose2d(FieldPoses.MIDDLE_APPROACH_POSE),
+        Commands.runOnce(() -> System.out.println("Second Approach")),
+
+        new CamCheck(swerve),
 
         // Takes Elevator and wrist to L4 Scoring Position
         new WristToPosition(wrist, WristPositions.TOGGLE_POSITION),
         new MoveElevatorToPosition(elevator, wrist, ElevatorHeights.HIGH_POSITION_L4),
         new WristToPosition(wrist, WristPositions.HIGH_WRIST_POSITION),
+        Commands.runOnce(() -> System.out.println("Elevator and wrist nonsense")),
 
-        Commands.runOnce(() -> {wrist.resetEncoder();}),
+        //Commands.runOnce(() -> {wrist.resetEncoder();}),
+
+        new CamCheck(swerve),
 
         // Slowly Drives To Scorring Position 
         swerve.setSlowPose2d(FieldPoses.MIDDLE_SCORE_POSE),  // MIDDLE SCORE //5.64, 4.22, Math.PI
+        Commands.runOnce(() -> System.out.println("Score pose")),
 
         // Outtakes
-        new Outtake(wrist, claw).withTimeout(0.3),
+        new Outtake(wrist, claw, elevator).withTimeout(0.3),
+        Commands.runOnce(() -> System.out.println("Outtake")),
 
         // Slowly Backs up From Reef
         swerve.setSlowPose2d(FieldPoses.MIDDLE_APPROACH_POSE),
@@ -130,7 +142,6 @@ public final class Autos {
         new WristToPosition(wrist, WristPositions.LOW_WRIST_POSITION)
 
       );
-       
     }
     */
 
@@ -167,7 +178,7 @@ public final class Autos {
       swerve.setSlowPose2d(FieldPoses.MIDDLE_SCORE_POSE),
      
       //Drop off
-      new Outtake(wrist, claw).withTimeout(.3),
+      new Outtake(wrist, claw, elevator).withTimeout(.3),
       
       //Backs us up while bringing elevator down
       new ParallelCommandGroup(
@@ -256,7 +267,7 @@ public final class Autos {
       swerve.setSlowPose2d(FieldPoses.MIDDLE_SCORE_POSE),
      
       //Drop off
-      new Outtake(wrist, claw).withTimeout(.2),
+      new Outtake(wrist, claw, elevator).withTimeout(.2),
       
       //Backs us up while bringing elevator down
       new ParallelCommandGroup(
@@ -310,7 +321,7 @@ public final class Autos {
 
       Commands.runOnce(() -> {wrist.resetEncoder();}),
 
-      new Outtake(wrist, claw).withTimeout(.3), 
+      new Outtake(wrist, claw, elevator).withTimeout(.3), 
     
       new ParallelCommandGroup( 
 
@@ -360,7 +371,7 @@ public final class Autos {
 
       Commands.runOnce(() -> {wrist.resetEncoder();}),
 
-      new Outtake(wrist, claw).withTimeout(.3), 
+      new Outtake(wrist, claw, elevator).withTimeout(.3), 
     
       new ParallelCommandGroup( 
 
@@ -387,6 +398,7 @@ public final class Autos {
      swerve.setPose2d(3.65, 3.044, Units.degreesToRadians(-312)));
 
     }
+
 
   private Autos() {
     throw new UnsupportedOperationException("This is a utility class!");

@@ -105,7 +105,7 @@ public class Elevator extends SubsystemBase {
     elevatorRightMotor.configure(elevatorRightMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
 
-    elevatorEncoder.setPosition(getLaserCanReading());
+    elevatorEncoder.setPosition(0);
     currentPosition = elevatorEncoder.getPosition();
 
   }

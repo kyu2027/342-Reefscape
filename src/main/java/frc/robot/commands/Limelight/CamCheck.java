@@ -8,8 +8,11 @@ package frc.robot.commands.Limelight;
 import java.util.ArrayList;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.LimelightHelpers;
 import frc.robot.LimelightHelpers.PoseEstimate;
@@ -19,6 +22,7 @@ import frc.robot.subsystems.Vision.Limelight;
 public class CamCheck extends Command {
   /** Creates a new AutoAlign :3<< */
   private SwerveDriveOdometry odometry;
+  private PoseEstimate poseEst;
   private Pose2d pose;
   private SwerveDrive swerve;
   private ArrayList<Pose2d> arrayList;
@@ -27,7 +31,8 @@ public class CamCheck extends Command {
   public CamCheck(SwerveDrive swerve) {
     System.out.println("test");
     this.swerve = swerve;
-    arrayList = new ArrayList<>();
+    arrayList = new ArrayList<Pose2d>();
+    poseEst = new PoseEstimate();
     pose = new Pose2d();
     }
 
@@ -42,17 +47,18 @@ public class CamCheck extends Command {
   @Override
   public void execute() {
     //checks if we're seeing a tag and if we're red
-    if (LimelightHelpers.getTA("") != 0 && swerve.isRed()){
-      pose = LimelightHelpers.getBotPose2d_wpiRed("");
-      arrayList.add(pose);
-    } else if (LimelightHelpers.getTA("") != 0 && !swerve.isRed()){ // if we're blue
-      pose = LimelightHelpers.getBotPose2d_wpiBlue("");
-      arrayList.add(pose);
-    } else {
+    
+    if (swerve.isRed()){
+      poseEst = LimelightHelpers.getBotPoseEstimate_wpiRed("");
+    } else { // if we're blue
+      poseEst = LimelightHelpers.getBotPoseEstimate_wpiBlue("");
+    } 
+    if (poseEst.tagCount > 0) {
+      arrayList.add(poseEst.pose);
+    } else
       //if we don't see a tag or our alliance is invalid (or something blows up i guess)
       failedAttempts += 1;
     } 
-  }
 
   // Called once the command ends or is interrupted.
   @Override
@@ -65,15 +71,20 @@ public class CamCheck extends Command {
         xsum += curPose2d.getX();
         ysum += curPose2d.getY();
       }
-      pose = new Pose2d(xsum/arrayList.size(), ysum/arrayList.size(), swerve.getGyro().getRotation2d());
+      pose = new Pose2d(xsum/arrayList.size(), ysum/arrayList.size(),new Rotation2d(swerve.gyroRad()));
       System.out.println(pose);
+      SmartDashboard.putNumber("Array list size", arrayList.size());
       swerve.resetOdometry(pose);
+
+
     }
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return failedAttempts > 10 || arrayList.size() > 6;
+    return failedAttempts > 20 || arrayList.size() > 10;
   }
+
+
 }
