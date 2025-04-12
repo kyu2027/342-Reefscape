@@ -25,7 +25,10 @@ public class WristWithJoystick extends Command {
   private double speed;
 
   private boolean goingDown;
-
+  private boolean tooFarDown;
+  private boolean tooFarUp;
+  private boolean downFailCondition;
+  private boolean upFailCondition;
   /** Creates a new WristWithJoystick. */
   public WristWithJoystick(XboxController joy, Wrist wrist) {
     this.joy = joy;
@@ -48,11 +51,14 @@ public class WristWithJoystick extends Command {
 
     goingDown = (speed > 0);
 
-    if((goingDown && currentPosition >= LOW_WRIST_POS) || (!goingDown && currentPosition <= HIGH_WRIST_POS))
+    if((goingDown && currentPosition >= LOW_WRIST_POS) || (!goingDown && currentPosition <= HIGH_WRIST_POS)){
       wrist.move(0);
-    else 
+      System.out.println("Not Moving");
+    }else {
       //Divided by four to reduce speed
+      System.out.println("Moving");
       wrist.move(speed/WRIST_SPEED_LIMITER);
+    }
   }
 
   // Called once the command ends or is interrupted.

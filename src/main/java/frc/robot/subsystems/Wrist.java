@@ -79,7 +79,7 @@ public class Wrist extends SubsystemBase {
     wristController = wrist.getClosedLoopController();
 
     wristConfig.closedLoop.p(WRIST_PID_VALUES[0]);
-    wristConfig.closedLoop.i(WRIST_PID_VALUES[1]);
+    // wristConfig.closedLoop.i(WRIST_PID_VALUES[1]);
     wristConfig.closedLoop.d(WRIST_PID_VALUES[2]);
     wristConfig.closedLoop.outputRange(-0.2, .2); 
 
@@ -93,10 +93,11 @@ public class Wrist extends SubsystemBase {
   public void move(double speed){
     if(Math.abs(speed) > 0.05) {
       wrist.set(speed);
-      currentPosition = getPosition();
     }else{
+      //wrist.set(0);
       holdWristPosition();
     }
+    currentPosition = getPosition();
   }
 
   /*

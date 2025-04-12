@@ -108,7 +108,6 @@ public class Elevator extends SubsystemBase {
 
     elevatorRightMotor.configure(elevatorRightMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-
     elevatorEncoder.setPosition(getLaserCanReading());
     currentPosition = elevatorEncoder.getPosition();
 
@@ -150,8 +149,8 @@ public class Elevator extends SubsystemBase {
       stop();
     else {
       elevatorPID.setReference(nextPosition, ControlType.kPosition);
-      currentPosition = nextPosition;}
-
+      currentPosition = nextPosition;
+    }
   }
 
   //This method will set the elevator motors to the inputted value
