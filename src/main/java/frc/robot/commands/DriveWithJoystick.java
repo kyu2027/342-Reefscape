@@ -51,22 +51,22 @@ public class DriveWithJoystick extends Command {
       double xSpeed = joyStick.getLeftY();
       double ySpeed = joyStick.getLeftX();
       double rotateSpeed = joyStick.getRawAxis(4);
+      double leftTriggerValue = joyStick.getLeftTriggerAxis();
+
+      double speedModifier = DriveConstants.MAX_DRIVE_SPEED - (leftTriggerValue * (DriveConstants.MAX_DRIVE_SPEED - DriveConstants.SLOW_DRIVE_SPEED));
+      double rotateModifier = DriveConstants.MAX_ROTATE_SPEED - (leftTriggerValue * (DriveConstants.MAX_ROTATE_SPEED - DriveConstants.SLOW_ROTATE_SPEED));
 
       /*Applies deadband */
       xSpeed = MathUtil.applyDeadband(xSpeed, 0.15);
       ySpeed = MathUtil.applyDeadband(ySpeed, 0.15);
       rotateSpeed = MathUtil.applyDeadband(rotateSpeed, 0.15);
 
-     if (swerve.getSlowMode()){
-      xSpeed = xSpeed * DriveConstants.SLOW_DRIVE_SPEED;
-      ySpeed = ySpeed * DriveConstants.SLOW_DRIVE_SPEED;
-     } else {
-     xSpeed = xSpeed * DriveConstants.MAX_DRIVE_SPEED;
-     ySpeed = ySpeed * DriveConstants.MAX_DRIVE_SPEED;
-    }
+      xSpeed = xSpeed * speedModifier;
+      ySpeed = ySpeed * speedModifier;
+      rotateSpeed = rotateSpeed * rotateModifier;
 
       /* Puts the x,y, and rotates speeds into a new ChassisSpeeds */
-      chassisSpeeds = new ChassisSpeeds(xSpeed, ySpeed, rotateSpeed);
+      chassisSpeeds = new ChassisSpeeds(-xSpeed, -ySpeed, -rotateSpeed);
 
       /* Passes through the Chassisspeeds just created into the Drive Method */
       swerve.drive(chassisSpeeds);
@@ -76,7 +76,6 @@ public class DriveWithJoystick extends Command {
       /* Gets values from the Left(Drive) and Right(Rotate) Joysticks on the Xbox controller */
       double xSpeed = joyStick.getLeftY();
       double ySpeed = joyStick.getLeftX();
-
 
       /*Applies deadband */
       xSpeed = MathUtil.applyDeadband(xSpeed, 0.15);
@@ -95,9 +94,7 @@ public class DriveWithJoystick extends Command {
       double rSpeed = -visionPID.calculate(tx, 0);
   
       /* Puts the x,y, and rotates speeds into a new ChassisSpeeds */
-
       chassisSpeeds = new ChassisSpeeds(-xSpeed, -ySpeed, -rSpeed);
-
 
       /* Passes through the Chassisspeeds just created into the Drive Method */
       swerve.drive(chassisSpeeds);

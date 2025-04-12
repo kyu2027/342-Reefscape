@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import java.security.DrbgParameters.Reseed;
+
 import org.opencv.core.Mat;
 
 
@@ -11,6 +13,8 @@ import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.PathConstraints;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 
 /**
@@ -56,6 +60,7 @@ public final class Constants {
     public static final double INTAKE_POSITION = 0.2; // 0.0
     public static final double L1_POSITION = 0.2; // 0.0
     public static final double L2_POSITION = 0.59; //  0.39
+    public static final double L3_POSITION = 0.72;
     public static final double L4_POSITION = 1.249; // 1.049
     public static final double SAFE_POSITION = 1.769; // 1.569
     public static final double MOVE_VALUE = 1.869; // 1.569
@@ -73,11 +78,10 @@ public final class Constants {
       MOVE_POSITION(MOVE_VALUE,ALGAE_POSITION),
       LOW_WRIST_POSITION(INTAKE_POSITION,ALGAE_POSITION),
       MIDDLE_WRIST_POSITION(L2_POSITION,ALGAE_POSITION), //CHANGE MADE
+      L3_WRIST_POSITION(L3_POSITION,ALGAE_POSITION),
       HIGH_WRIST_POSITION(L4_POSITION,BARGE_POSITION), //CHANGE MADE
       PROCESSOR_WRIST_POSITION(INTAKE_POSITION,ALGAE_POSITION),
       ALGAE_WRIST_POSITION(ALGAE_POSITION,ALGAE_POSITION);
-
-
 
       private double coralPosition;
       private double algaePosition;
@@ -102,7 +106,6 @@ public final class Constants {
       HIGH_MIDDLE_POSITION_L3(L3_HEIGHT,ALGAE_HIGH_HEIGHT),
       HIGH_POSITION_L4(L4_HEIGHT,TOP_POSITION),
       PROCESSOR_POSITION(PROCESSOR_HEIGHT,PROCESSOR_HEIGHT);
-
 
       private double coralHeight;
       private double algaeHeight;
@@ -137,7 +140,7 @@ public final class Constants {
     public static final double L2_HEIGHT = 241.7 /**300.0*/;
     public static final double L3_HEIGHT = 644.58 /**485.0*/;
     public static final double L4_HEIGHT = 1384.0 /**850.0*/;
-    public static final double PROCESSOR_HEIGHT = 0.0;
+    public static final double PROCESSOR_HEIGHT = 36.0;
 
     public static final double ALGAE_LOW_HEIGHT = 462.36;
     public static final double ALGAE_HIGH_HEIGHT = 884.672;
@@ -158,10 +161,10 @@ public final class Constants {
 
     public static final double WHEEL_DIAMETER = Units.inchesToMeters(3.77);
 
-    public static final double FL_WHEEL_DIAMETER = Units.inchesToMeters(3.74);
-    public static final double FR_WHEEL_DIAMETER = Units.inchesToMeters(3.87);
-    public static final double BL_WHEEL_DIAMETER = Units.inchesToMeters(3.73);
-    public static final double BR_WHEEL_DIAMETER = Units.inchesToMeters(3.77);
+    public static final double FL_WHEEL_DIAMETER = Units.inchesToMeters(3.886);
+    public static final double FR_WHEEL_DIAMETER = Units.inchesToMeters(3.804);
+    public static final double BL_WHEEL_DIAMETER = Units.inchesToMeters(3.808);
+    public static final double BR_WHEEL_DIAMETER = Units.inchesToMeters(3.881);
 
     public static final double WHEEL_CIRCUMFERENCE = 2 * Math.PI;
 
@@ -191,7 +194,7 @@ public final class Constants {
     public static final double DRIVE_FF_VALUE = 0.25;
 
     // Rotate PID Values
-    public static final double ROTATE_P_VALUE = 0.35;
+    public static final double ROTATE_P_VALUE = 0.55;
     public static final double ROTATE_I_VALUE = 0.0;
     public static final double ROTATE_D_VALUE = 0.4;
     public static double ROTATE_FF_VALUE;
@@ -203,8 +206,6 @@ public final class Constants {
     public static final double BACK_LEFT_OFFSET = 3.09;
     public static final double BACK_RIGHT_OFFSET = 5.96;
 
-
-
     // Factors
     //public static final double DRIVE_POSITION_CONVERSION = ((Math.PI * WHEEL_DIAMETER) / DRIVE_GEAR_RATIO);
     //public static final double DRIVE_VELOCITY_CONVERSION = DRIVE_POSITION_CONVERSION / 60;
@@ -213,10 +214,11 @@ public final class Constants {
     public static final double ROTATE_VELOCITY_CONVERSION = ROTATE_POSITION_CONVERSION / 60;
 
     // Speeds
-    public static double MAX_DRIVE_SPEED = Units.feetToMeters(6);
+    public static double MAX_DRIVE_SPEED = Units.feetToMeters(15);
     public static double SLOW_DRIVE_SPEED = Units.feetToMeters(2);
 
-    public static double MAX_ROTATE_SPEED = 4 * Math.PI;
+    public static double SLOW_ROTATE_SPEED = .5 * Math.PI;
+    public static double MAX_ROTATE_SPEED = 1 * Math.PI;
 
 
     public static final PPHolonomicDriveController PATH_CONFIG_CONTROLLER = new PPHolonomicDriveController
@@ -225,11 +227,104 @@ public final class Constants {
         new PIDConstants(0.25, 0, 0.3));
 
 
-    public static final PathConstraints CONSTRAINTS = new PathConstraints(1.0, 20, 1.0, 1.0);
+    public static final PathConstraints CONSTRAINTS = new PathConstraints(2.5, 4, 7, 8);
+
+    public static final PathConstraints SLOW_CONSTRAINTS = new PathConstraints(1,2, 6, 7);
 
   }
 
-  public static class OperatorConstants {
-    public static final int kDriverControllerPort = 0;
+  public static class AutoConstants {
+
+    public enum FieldPoses {
+
+      // Middle poses
+      MIDDLE_START_POSE (
+        new Pose2d(1,1, new Rotation2d(0)),  // Start : Red 
+        new Pose2d(1,1,new Rotation2d(0))),  // Start : Blue 
+
+      MIDDLE_APPROACH_POSE (
+        new Pose2d(6.41, 3.898, new Rotation2d(Math.PI)), // Approach : Red
+        new Pose2d(6.305,3.875,new Rotation2d(Math.PI))), // Approach : Blue
+
+      MIDDLE_SCORE_POSE (
+        new Pose2d(5.445,3.898, new Rotation2d(Math.PI)), // Score : Red
+        new Pose2d(5.464, 3.875,new Rotation2d(Math.PI))), // Score : Blue
+
+      // Left Pose
+      LEFT_START_POSE (
+        new Pose2d(1,1, new Rotation2d(0)), // Start : Red 
+        new Pose2d(1,1,new Rotation2d(0))), // Start : Blue 
+
+      LEFT_APPROACH_POSE (
+        new Pose2d(1,2, new Rotation2d(0)), // Approach : Red
+        new Pose2d(1,1,new Rotation2d(0))), // Approach : Red
+
+      LEFT_SCORE_POSE (
+        new Pose2d(1,2, new Rotation2d(0)), // Score : Red
+        new Pose2d(1,1,new Rotation2d(0))), // Score : Blue
+
+      //Right Poses
+      RIGHT_START_POSE (
+        new Pose2d(1,1, new Rotation2d(0)), // Start : Red 
+        new Pose2d(1,1,new Rotation2d(0))), // Start : Blue 
+
+      RIGHT_APPROACH_POSE(
+        new Pose2d(1,2, new Rotation2d(0)), // Approach : Red
+        new Pose2d(1,1,new Rotation2d(0))), // Approach : Blue
+
+      RIGHT_SCORE_POSE(
+        new Pose2d(1,2, new Rotation2d(0)), // Score : Red
+        new Pose2d(1,1,new Rotation2d(0))), // Score : Blue
+
+      CORAL_STATION_RIGH_POSE(
+        new Pose2d(1.439,0.836, new Rotation2d(-312)), //Red
+        new Pose2d(1.439,0.836, new Rotation2d(Units.degreesToRadians(-312)))  //Blue
+      ),
+      
+      CORAL_STATION_RIGHT_APPROACH(
+        new Pose2d(3.308, 2.367, new Rotation2d(Units.degreesToRadians(70))), //Red
+        new Pose2d(3.308, 2.367, new Rotation2d(Units.degreesToRadians(70)))),  //Blue
+
+
+      SECOND_PIECE_SCORE(
+          new Pose2d(3.308, 2.367, new Rotation2d(Units.degreesToRadians(70))), //Red
+          new Pose2d(3.716,3.014, new Rotation2d(Units.degreesToRadians(-312))))  //Blue
+      
+      ;
+
+      private Pose2d redSide;
+      private Pose2d blueSide;
+
+      FieldPoses (Pose2d redSide, Pose2d blueSide){
+        this.redSide = redSide;
+        this.blueSide = blueSide;
+      }
+
+      public Pose2d getPose2d(boolean isRed) {
+        return isRed ? redSide : blueSide;
+      }
+
+    } 
+   
+  }
+
+  public static class ClimbConstants {
+    public static final int CLIMB_ID = 14;
+    public static final int FUNNEL_ID = 12;
+    public static final int FUNNEL_DUTY_ID = 9;
+
+    public static final double CLIMB_UP = 240; //TODO
+    //replace with accurate values TODO
+    public static final double FUNNEL_UP = -33;
+    public static final double FUNNEL_DOWN = 0;
+
+    public static final double FUNNEL_P = 0.1;
+    public static final double FUNNEL_I = 0.00;
+    public static final double FUNNEL_D = 0.08;
+    public static final double CLIMB_P = 0.1;
+    
+    public static final double CLIMB_I = 0.0;
+    public static final double CLIMB_D = 0.1;
+
   }
 }

@@ -26,23 +26,17 @@ public class MoveElevatorToPosition extends Command {
   public ElevatorConstants.ElevatorHeights enumPosition;
 
   private double nextPosition;
-  private boolean hold;
 
   /** Creates a new MoveElevatorToPosition. */
-  public MoveElevatorToPosition(Elevator elevator, Wrist wrist, ElevatorConstants.ElevatorHeights position, Boolean hold) {
+  public MoveElevatorToPosition(Elevator elevator, Wrist wrist, ElevatorConstants.ElevatorHeights position) {
 
     this.elevator = elevator;
     this.wrist = wrist;
     enumPosition = position;
-    this.hold = hold;
 
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(elevator);
 
-  }
-
-  public MoveElevatorToPosition(Elevator elevator, Wrist wrist, ElevatorConstants.ElevatorHeights position) {
-    this(elevator, wrist, position, false);
   }
 
   // Called when the command is initially scheduled.
@@ -61,16 +55,11 @@ public class MoveElevatorToPosition extends Command {
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {
-    elevator.holdPosition();
-  }
+  public void end(boolean interrupted) {}
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    if(!hold)
-      return (elevator.getEncoderPosition() > (nextPosition - ELEVATOR_ERROR)) && (elevator.getEncoderPosition() < (nextPosition + ELEVATOR_ERROR));
-    else
-      return false;
+    return Math.abs(elevator.getEncoderPosition() - nextPosition) < ELEVATOR_ERROR;
   }
 }

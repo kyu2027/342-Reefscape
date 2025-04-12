@@ -31,6 +31,9 @@ public class Claw extends SubsystemBase {
 
     private double currPos;
     private double lastPos;
+
+    private boolean hasCoral;
+    private boolean tooFar;
   
 
   public Claw() {
@@ -61,17 +64,23 @@ public class Claw extends SubsystemBase {
   public void intakeCoral(){
     if(forwardSensor.get() && backwardSensor.get()){
       claw.set(-.35);
-      System.out.println("Neither back or front can see");
+      hasCoral = false;
+      //System.out.println("Neither back or front can see");
       
     }
     else if(forwardSensor.get() && !backwardSensor.get()){
       claw.set(-.05);
-        System.out.println("Front can't see, Back can see");
+      hasCoral = false;
+       // System.out.println("Front can't see, Back can see");
     }
     else if(!forwardSensor.get() && !backwardSensor.get()){
       claw.set(0);
-
-      System.out.println("nothing should be spinning");
+      hasCoral = true;
+      
+      //System.out.println("nothing should be spinning");
+    }else if (!forwardSensor.get() && backwardSensor.get()){
+      reverseCoralIntake();
+      System.out.println("Front can see, Back can not");
     }
 
   }
@@ -88,6 +97,10 @@ public class Claw extends SubsystemBase {
     claw.set(speed);
   }
 
+  public boolean hasCoral(){
+    return hasCoral;
+  }
+
  // public double getLastPos(){
   //    return currPos;
   //  }
@@ -95,10 +108,6 @@ public class Claw extends SubsystemBase {
     //public double getCurrentPos(){
       //return currPos;
     //}
-
-  public boolean hasCoral() {
-    return !forwardSensor.get() && !backwardSensor.get();
-  }
   
   @Override
   public void initSendable (SendableBuilder sendableBuilder) {

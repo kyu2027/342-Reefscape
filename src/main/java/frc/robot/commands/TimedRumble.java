@@ -5,23 +5,22 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.Claw;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj.DriverStation;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class TimedRumble extends Command {
 
-  Claw claw;
-  XboxController joy;
-  double time;
-  double strength;
-  Timer timer;
+  private XboxController joy;
+  private double time;
+  private double strength;
+  private Timer timer;
 
   /** Creates a new TimedRumble. */
-  public TimedRumble(Claw claw, XboxController joy, double time, double strength) {
-    this.claw = claw;
+  public TimedRumble(XboxController joy, double time, double strength) {
+
     this.joy = joy;
     this.time = time;
     this.strength = strength;
@@ -39,14 +38,8 @@ public class TimedRumble extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-
-    if(claw.hasCoral()) {
-
       joy.setRumble(RumbleType.kBothRumble, strength);
       timer.start();
-
-    }
-
   }
 
   // Called once the command ends or is interrupted.

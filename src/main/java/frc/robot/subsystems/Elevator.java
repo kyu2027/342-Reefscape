@@ -6,22 +6,18 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static frc.robot.Constants.ElevatorConstants.*;
-import static frc.robot.Constants.WristConstants.THROUGHBORE_PORT;
 
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.config.MAXMotionConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
-import com.revrobotics.spark.config.MAXMotionConfig.MAXMotionPositionMode;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkClosedLoopController;
 import edu.wpi.first.util.sendable.SendableBuilder;
-import au.grapplerobotics.LaserCan;
-import au.grapplerobotics.interfaces.LaserCanInterface.Measurement;
+import edu.wpi.first.wpilibj.DriverStation;
 
 public class Elevator extends SubsystemBase {
 
@@ -30,6 +26,7 @@ public class Elevator extends SubsystemBase {
   private boolean goingDown;
   private boolean tooLow;
   private boolean tooHigh;
+  private boolean atPosition;
 
   private double currentPosition;
 
@@ -40,29 +37,17 @@ public class Elevator extends SubsystemBase {
 
   private SparkMaxConfig elevatorLeftMotorConfig;
   private SparkMaxConfig elevatorRightMotorConfig;
-  //private MAXMotionConfig elevatorPIDConfig;
-
-  private LaserCan elevatorLaserCan;
 
   /** Creates a new Elevator. */
   public Elevator() {
 
     goingDown = false;
+    atPosition = false;
 
     elevatorLeftMotor = new SparkMax(ELEVATORLEFT_ID, MotorType.kBrushless);
     elevatorRightMotor = new SparkMax(ELEVATORRIGHT_ID, MotorType.kBrushless);
 
     elevatorPID = elevatorRightMotor.getClosedLoopController();
-
-    //elevatorPIDConfig = new MAXMotionConfig();
-
-    /*
-     * Configure the LaserCAN using the GrappleHook app as some of the code throws a 
-     * ConfigurationFailedException error. Short ranging mode is ideal due to less 
-     * interference from ambient light, but it only goes up to 1.3 meters while Long 
-     * ranging mode goes up to 4 meters.
-     */
-    elevatorLaserCan = new LaserCan(LASERCAN_ID);
 
     elevatorLeftMotorConfig = new SparkMaxConfig();
 
@@ -89,15 +74,9 @@ public class Elevator extends SubsystemBase {
     elevatorEncoder = elevatorRightMotor.getEncoder();
 
     //PID values are still being tuned, but these values do work
-    elevatorRightMotorConfig.closedLoop.p(0.005);
-    elevatorRightMotorConfig.closedLoop.i(0);
-    elevatorRightMotorConfig.closedLoop.d(0);
-    /*
-     * Elevator is slowed right now to prevent damages during testing.
-     * Still don't know if we'll let it go full speed once everything
-     * is figured out.
-     */
-    elevatorRightMotorConfig.closedLoop.outputRange(-.3, .6);
+    elevatorRightMotorConfig.closedLoop
+      .pid(0.005, 0, 0.0015)
+      .outputRange(-.5, 1);
     // elevatorRightMotorConfig.closedLoop.maxMotion.maxAcceleration(2);
     // elevatorRightMotorConfig.closedLoop.maxMotion.maxVelocity(10);
     // elevatorRightMotorConfig.closedLoop.maxMotion.allowedClosedLoopError(10);
@@ -108,20 +87,9 @@ public class Elevator extends SubsystemBase {
 
     elevatorRightMotor.configure(elevatorRightMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-    elevatorEncoder.setPosition(getLaserCanReading());
+    resetElevator();
     currentPosition = elevatorEncoder.getPosition();
 
-  }
-
-  //Returns the reading of the laserCAN in millimeters
-  public int getLaserCanReading() {
-    Measurement measurement = elevatorLaserCan.getMeasurement();
-    if(measurement != null) {
-      return measurement.distance_mm;
-    }else{
-      return 0;
-    }
-    //return elevatorLaserCan.getMeasurement().distance_mm;
   }
 
   //Returns the reading of the relative encoder
@@ -129,17 +97,9 @@ public class Elevator extends SubsystemBase {
     return elevatorEncoder.getPosition();
   }
 
-  /*
-   * The method below has been commented out because it is unlikely to be used
-   */
-  // //Returns true if an object is _ millimeters to the bottom of the elevator;
-  // public boolean objectTooClose() {
-  //   //Placeholder values, change after figuring out how close the elevator is to the ground
-  //   return getLaserCanReading() == 0;
-  // }
-
   //Moves the elevator to the given position
   public void ElevatorToPosition(double nextPosition) {
+    atPosition = false;
 
     goingDown = currentPosition > nextPosition;
     tooLow = elevatorEncoder.getPosition() < BOTTOM_POSITION;
@@ -151,6 +111,8 @@ public class Elevator extends SubsystemBase {
       elevatorPID.setReference(nextPosition, ControlType.kPosition);
       currentPosition = nextPosition;
     }
+
+    isAtPosition(nextPosition);
   }
 
   //This method will set the elevator motors to the inputted value
@@ -168,19 +130,27 @@ public class Elevator extends SubsystemBase {
     elevatorRightMotor.stopMotor();
   }
 
-  //Sets the encoder position to the laserCAN position
-  public void resetEncoder() {
-    elevatorEncoder.setPosition((double) (getLaserCanReading()));
-  }
-
   //Holds the current position
   public void holdPosition() {
     elevatorPID.setReference(currentPosition, ControlType.kPosition);
   }
 
+  //Checks if the elevator is at the correct position
+  public void isAtPosition(double nextPosition) {
+    atPosition = Math.abs(getEncoderPosition() - nextPosition) < ELEVATOR_ERROR;
+  }
+
+  //Resets the elevator to the starting position
+  public void resetElevator(){
+    elevatorEncoder.setPosition(0);
+  }
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    if(atPosition) {
+      holdPosition();
+    }
   }
 
   @Override
@@ -190,9 +160,8 @@ public class Elevator extends SubsystemBase {
     builder.setSmartDashboardType("Elevator");
 
     //Data being put on Elastic for debugging purposes
-    builder.addDoubleProperty("LaserCAN Reading", () -> getLaserCanReading(), null);
-    builder.addDoubleProperty("Relative Encoder Reading", () -> getEncoderPosition(), null);
-    builder.addDoubleProperty("Elevator Error", () -> ((double) (getLaserCanReading())) - getEncoderPosition(), null);
+    builder.addDoubleProperty("Elevator Position", () -> getEncoderPosition(), null);
+    builder.addStringProperty("DS Message", () -> DriverStation.getGameSpecificMessage(), null);
   }
 
 }
