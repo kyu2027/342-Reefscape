@@ -13,6 +13,9 @@ import javax.print.attribute.standard.MediaSize.NA;
 
 import org.json.simple.parser.ParseException;
 
+import com.ctre.phoenix.sensors.PigeonIMU;
+import com.ctre.phoenix.sensors.WPI_PigeonIMU;
+import com.ctre.phoenix6.hardware.Pigeon2;
 import com.fasterxml.jackson.core.filter.FilteringGeneratorDelegate;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.RobotConfig;
@@ -39,7 +42,9 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.ADIS16448_IMU.IMUAxis;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -47,8 +52,11 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 public class SwerveDrive extends SubsystemBase {
 
   private SwerveDriveKinematics kinematics;
-  private SwerveDriveOdometry odometry;
+  public SwerveDriveOdometry odometry;
   private AHRS NavX;
+
+  private PigeonIMU pigeon;
+  private WPI_PigeonIMU piegon2;
 
   private ChassisSpeeds chassisSpeeds;
   
@@ -78,8 +86,7 @@ public class SwerveDrive extends SubsystemBase {
   
     /** Creates a new SwerveDrive. */
     public SwerveDrive() {
-
-         chassisSpeeds = new ChassisSpeeds(0, 0, 0);
+        chassisSpeeds = new ChassisSpeeds(0,0,0);
 
         redSide = isRed();
 
@@ -87,40 +94,48 @@ public class SwerveDrive extends SubsystemBase {
           DriveConstants.FRONT_LEFT_DRIVE_ID, 
           DriveConstants.FRONT_LEFT_ROTATE_ID, 
           DriveConstants.FL_ENCODER_PORT, 
+
           false, true, 
           DriveConstants.FRONT_LEFT_OFFSET, 
           "FL",
           DriveConstants.FL_WHEEL_DIAMETER
+
           );
   
           frontRightModule = new SwerveModule(
           DriveConstants.FRONT_RIGHT_DRIVE_ID, 
           DriveConstants.FRONT_RIGHT_ROTATE_ID, 
           DriveConstants.FR_ENCODER_PORT, 
+
           false, true, 
           DriveConstants.FRONT_RIGHT_OFFSET, 
           "FR",
           DriveConstants.FR_WHEEL_DIAMETER
+
           );
   
           backLeftModule = new SwerveModule(
           DriveConstants.BACK_LEFT_DRIVE_ID, 
           DriveConstants.BACK_LEFT_ROTATE_ID, 
           DriveConstants.BL_ENCODER_PORT, 
+
           false, true, 
           DriveConstants.BACK_LEFT_OFFSET, 
           "BL",
           DriveConstants.BL_WHEEL_DIAMETER
+
           );
   
           backRightModule = new SwerveModule(
           DriveConstants.BACK_RIGHT_DRIVE_ID, 
           DriveConstants.BACK_RIGHT_ROTATE_ID, 
           DriveConstants.BR_ENCODER_PORT, 
+
           false, true, 
           DriveConstants.BACK_RIGHT_OFFSET, 
           "BR",
           DriveConstants.BR_WHEEL_DIAMETER
+
           );
   
           field = new Field2d();
@@ -137,12 +152,14 @@ public class SwerveDrive extends SubsystemBase {
   
         /* Initalize NavX (Gyro) */
         NavX = new AHRS(AHRS.NavXComType.kUSB1);
+
+        piegon2 = new WPI_PigeonIMU(16);
   
         /* Initalizes Odometry */
         odometry = new SwerveDriveOdometry( 
   
           kinematics, 
-          Rotation2d.fromDegrees(-NavX.getAngle() % 360),
+          new Rotation2d(gyroRad()),
           getCurrentSwerveModulePositions()
   
           );
@@ -151,7 +168,6 @@ public class SwerveDrive extends SubsystemBase {
       
         fieldOriented = false;
         slowMode = false;
-        
 
       poseSupplier = () -> getPose2d();
       resetPoseConsumer = pose -> resetOdometry(pose);
@@ -167,12 +183,14 @@ public class SwerveDrive extends SubsystemBase {
           e.printStackTrace();
         }    
 
+
         field = new Field2d();
+
   
           new Thread(() -> {
             try {
               Thread.sleep(1000);
-              NavX.reset();
+              piegon2.setYaw(0); //NAVX WAS HERE
             } catch (Exception e) {}
           }).start();
   
@@ -200,7 +218,9 @@ public class SwerveDrive extends SubsystemBase {
   
       public ChassisSpeeds getChassisSpeeds(){
   
+
         return chassisSpeeds;
+
   
       }
   
@@ -213,7 +233,7 @@ public class SwerveDrive extends SubsystemBase {
            before passing it through the rest of the drive Method */
   
           if (fieldOriented) {
-            chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(chassisSpeeds, new Rotation2d(NavX.getRotation2d().getRadians()));
+            chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(chassisSpeeds, new Rotation2d(gyroRad())); //NAVX USED TO BE HERE
   
           }
 
@@ -281,15 +301,11 @@ public class SwerveDrive extends SubsystemBase {
     }
 
     public Command setPose2d(double X, double Y, double rotation){
-      return AutoBuilder.pathfindToPose(new Pose2d(X, Y, new Rotation2d(rotation)), DriveConstants.CONSTRAINTS);
+      return AutoBuilder.pathfindToPose(new Pose2d(X, Y, new Rotation2d(Units.degreesToRadians(rotation))), DriveConstants.CONSTRAINTS);
     }
 
     public Command setSlowPose2d(double X, double Y, double rotation){
-      return AutoBuilder.pathfindToPose(new Pose2d(X, Y, new Rotation2d(rotation)), DriveConstants.SLOW_CONSTRAINTS);
-    }
-
-    public Command posetest(double X, double Y, double rotation){
-      return AutoBuilder.pathfindToPose(new Pose2d(X, Y, new Rotation2d(rotation)), DriveConstants.CONSTRAINTS);
+      return AutoBuilder.pathfindToPose(new Pose2d(X, Y, new Rotation2d(Units.degreesToRadians(rotation))), DriveConstants.SLOW_CONSTRAINTS);
     }
 
     public Command setPose2d(AutoConstants.FieldPoses pose){
@@ -301,16 +317,31 @@ public class SwerveDrive extends SubsystemBase {
     }
 
     public void resetOdometry(Pose2d pose){
-       odometry.resetPosition(NavX.getRotation2d(), getCurrentSwerveModulePositions(), pose);
+       odometry.resetPosition(new Rotation2d(gyroRad()), getCurrentSwerveModulePositions(), pose);
+
     }
     
     public AHRS getGyro(){
       return NavX;
     }
 
+    public WPI_PigeonIMU getPiegon(){
+      return piegon2;
+    }
+
+    public double gyroRad(){
+      return piegon2.getYaw() * Math.PI/180;
+    }
+
+    public void resetGyro(){
+      piegon2.setYaw(0);
+    }
+
     public void resetPose(Pose2d pose){
       odometry.resetPose(pose);
     }
+
+    
 
   
     public void resetPoseLimelight(){
@@ -396,26 +427,29 @@ public class SwerveDrive extends SubsystemBase {
 
     sendableBuilder.addBooleanProperty("Field Orienated", ()-> fieldOriented, null);
     sendableBuilder.addBooleanProperty("Slow Mode", ()-> slowMode, null);
-    sendableBuilder.addDoubleProperty("Gyro Reading", ()-> NavX.getAngle() % 360, null);
+
+    sendableBuilder.addDoubleProperty("Gyro Reading", ()-> gyroRad(), null); //NAVX USED TO BE HERE
+    sendableBuilder.addDoubleProperty("Raw Gyro Reading", ()-> piegon2.getYaw(), null); //NAVX USED TO BE HERE
 
     sendableBuilder.addDoubleProperty("FL Distance Travelled", ()-> frontLeftModule.getDistance(), null);
     sendableBuilder.addDoubleProperty("FL Velocity", ()-> frontLeftModule.getDriveVelocity(), null);
 
     sendableBuilder.addDoubleProperty("Pose2d  X", () ->  odometry.getPoseMeters().getX(), null);
     sendableBuilder.addDoubleProperty("Pose2d  Y", () ->  odometry.getPoseMeters().getY(), null);
-    
 
     sendableBuilder.addDoubleProperty("Rotations", () ->  odometry.getPoseMeters().getRotation().getRadians(), null);
 
-    sendableBuilder.addDoubleProperty("Chasis speeds, X", () -> getChassisSpeeds().vxMetersPerSecond, null);
-    sendableBuilder.addDoubleProperty("Chasis speeds, Y", () -> getChassisSpeeds().vyMetersPerSecond, null);
-    sendableBuilder.addDoubleProperty("Chasis speeds, rotation", () -> getChassisSpeeds().omegaRadiansPerSecond, null);
+    sendableBuilder.addDoubleProperty("Chassis speeds, X", () -> getChassisSpeeds().vxMetersPerSecond, null);
+    sendableBuilder.addDoubleProperty("Chassis speeds, Y", () -> getChassisSpeeds().vyMetersPerSecond, null);
+    sendableBuilder.addDoubleProperty("Chassis speeds, rotation", () -> getChassisSpeeds().omegaRadiansPerSecond, null);
 
     sendableBuilder.addFloatProperty("Tag Number", () -> tag, null);
 
-    sendableBuilder.addBooleanProperty("Am i red?", () -> redSide, null);
+    sendableBuilder.addBooleanProperty("Am I red?", () -> redSide, null);
 
     sendableBuilder.addDoubleProperty("Field setter", () -> {return 0.0;}, (double dummy) -> resetPoseLimelight());
+    sendableBuilder.addDoubleProperty("Gyro Rester", () -> {return 0.0;}, (double dummy) -> resetGyro());
+
 
     sendableBuilder.addDoubleProperty("Match Time", () -> DriverStation.getMatchTime(), null);
     
@@ -428,9 +462,8 @@ public class SwerveDrive extends SubsystemBase {
     // This method will be called once per scheduler run
 
     //Updates the odometry every run
-    odometry.update(Rotation2d.fromDegrees(-NavX.getAngle() % 360), getCurrentSwerveModulePositions());
+    odometry.update(new Rotation2d(gyroRad()), getCurrentSwerveModulePositions());
     field.setRobotPose(odometry.getPoseMeters());
-    
 
   }
 }

@@ -175,10 +175,10 @@ public final class Constants {
 
     public static final double WHEEL_DIAMETER = Units.inchesToMeters(3.77);
 
-    public static final double FL_WHEEL_DIAMETER = Units.inchesToMeters(3.886);
-    public static final double FR_WHEEL_DIAMETER = Units.inchesToMeters(3.804);
-    public static final double BL_WHEEL_DIAMETER = Units.inchesToMeters(3.808);
-    public static final double BR_WHEEL_DIAMETER = Units.inchesToMeters(3.881);
+    public static final double FL_WHEEL_DIAMETER = Units.inchesToMeters(3.849);
+    public static final double FR_WHEEL_DIAMETER = Units.inchesToMeters(3.841);
+    public static final double BL_WHEEL_DIAMETER = Units.inchesToMeters(3.801);
+    public static final double BR_WHEEL_DIAMETER = Units.inchesToMeters(3.717);
 
     public static final double WHEEL_CIRCUMFERENCE = 2 * Math.PI;
 
@@ -216,7 +216,7 @@ public final class Constants {
     // Offsets
 
     public static final double FRONT_LEFT_OFFSET = 0.81;
-    public static final double FRONT_RIGHT_OFFSET = 4.42;
+    public static final double FRONT_RIGHT_OFFSET = 4.19;
     public static final double BACK_LEFT_OFFSET = 3.09;
     public static final double BACK_RIGHT_OFFSET = 5.96;
 
@@ -257,11 +257,11 @@ public final class Constants {
         new Pose2d(1,1,new Rotation2d(0))),  // Start : Blue 
 
       MIDDLE_APPROACH_POSE (
-        new Pose2d(6.41, 3.898, new Rotation2d(Math.PI)), // Approach : Red
+        new Pose2d(6.36, 3.864, new Rotation2d(Math.PI)), // Approach : Red
         new Pose2d(6.305,3.875,new Rotation2d(Math.PI))), // Approach : Blue
 
       MIDDLE_SCORE_POSE (
-        new Pose2d(5.445,3.898, new Rotation2d(Math.PI)), // Score : Red
+        new Pose2d(5.544,3.864, new Rotation2d(Math.PI)), // Score : Red
         new Pose2d(5.464, 3.875,new Rotation2d(Math.PI))), // Score : Blue
 
       // Left Pose
@@ -322,6 +322,23 @@ public final class Constants {
    
   }
 
+  public static class ClimbConstants {
+    public static final int CLIMB_ID = 14;
+    public static final int FUNNEL_ID = 12;
+    public static final int FUNNEL_DUTY_ID = 9;
 
+    public static final double CLIMB_UP = 240; //TODO
+    //replace with accurate values TODO
+    public static final double FUNNEL_UP = -33;
+    public static final double FUNNEL_DOWN = 0;
 
+    public static final double FUNNEL_P = 0.1;
+    public static final double FUNNEL_I = 0.00;
+    public static final double FUNNEL_D = 0.08;
+    public static final double CLIMB_P = 0.1;
+    
+    public static final double CLIMB_I = 0.0;
+    public static final double CLIMB_D = 0.1;
+
+  }
 }

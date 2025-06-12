@@ -7,6 +7,8 @@ package frc.robot;
 import frc.robot.commands.DriveWithJoystick;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.commands.SpinClaw;
+import frc.robot.commands.Climber.ClimbDown;
+import frc.robot.commands.Climber.ClimbUp;
 import frc.robot.commands.Auto.Autos;
 import frc.robot.commands.Auto.RotateToAngle;
 import frc.robot.commands.Claw.Intake;
@@ -19,6 +21,7 @@ import frc.robot.Constants.ElevatorConstants.ElevatorHeights;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.WristConstants.WristPositions;
 import frc.robot.subsystems.*;
+import frc.robot.subsystems.Vision.Limelight;
 
 import static frc.robot.Constants.ElevatorConstants.*;
 import static frc.robot.Constants.WristConstants.*;
@@ -38,7 +41,9 @@ import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Commands;
 
+import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.commands.PathfindingCommand;
 
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.UsbCamera;
@@ -57,6 +62,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import frc.robot.commands.Limelight.*;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -69,6 +75,22 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
  */
 public class RobotContainer {
 
+
+  // Because the angles are the same for both L2 & L3, there will only be an L2
+  // command that will be used for both
+
+  private final MoveElevatorWithJoystick moveElevatorWithJoystick;
+
+  private Command onStop;
+  private SpinClaw intakeCommand;
+  private Command outtakeCommand;
+
+  private final JoystickButton toggleClimbButton;
+  private final JoystickButton climbButton;
+
+
+  // The robot's subsystems and commands are defined here...
+  
   // Controllers 
   private XboxController operator;
   private XboxController driver;
@@ -78,23 +100,33 @@ public class RobotContainer {
   private Elevator elevator;
   private SwerveDrive swerve;
   private Claw claw;
+  private Climber climber;
+
+  private Limelight limelight;
 
   // Commands
   private Intake intake;
   private Outtake outtake;
-  private MoveElevatorWithJoystick moveElevatorWithJoystick;
   private WristWithJoystick wristWithJoy;
   private DriveWithJoystick driveWithJoystick;
+  private RotateToAngle rotate90;
   private Command fieldOrienatedCommand;
   private Command slowModeToggle;
 
+  private Command alignLeftCoral;
+  private Command alignRightCoral;
+
   private Command driveAssistToggle;
+  private ClimbUp climb;
+  private ClimbDown climbDown;
 
   private Command toggleCoralMode;
   private Command toggleAlgaeMode;
 
   private Command reverseCoralIntake;
   private Command slowOuttake;
+
+  private Command camCheck;
 
   private Command limeLightReset;
 
@@ -108,6 +140,7 @@ public class RobotContainer {
   private SequentialCommandGroup goToL3;
   private SequentialCommandGroup goToL4;
   private SequentialCommandGroup goToProcessor;
+  private ParallelCommandGroup climbUp;
 
   // Buttons
   private JoystickButton intakeButton;
@@ -120,7 +153,7 @@ public class RobotContainer {
   private JoystickButton fieldOrienatedButton;
   private JoystickButton slowModeButton;
 
-  private JoystickButton driveAssistButton;
+  private JoystickButton camCheckButton;
 
   private JoystickButton elevatorOverrideButton;
   private JoystickButton wristOverrideButton;
@@ -134,6 +167,8 @@ public class RobotContainer {
   private JoystickButton reverseCoralButton;
   private JoystickButton slowOuttakeButton;
 
+  private JoystickButton rotate90Button;
+
   private JoystickButton limeLighButton;
 
   public UsbCamera camera;
@@ -142,20 +177,58 @@ public class RobotContainer {
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
-
-    // Controllers
-    driver = new XboxController(0);
-    operator = new XboxController(1);
+    // The robot's subsystems and commands are defined here...
 
     // Subsytems 
     wrist = new Wrist();
     elevator = new Elevator();
     claw = new Claw();
     swerve = new SwerveDrive();
+    limelight = new Limelight("");
+  
+    climber = new Climber();
+
+    SmartDashboard.putData(wrist);
+
+    // Controllers
+    driver = new XboxController(0);
+    operator = new XboxController(1);
+
+    //PathPlanner Commands
+
+    NamedCommands.registerCommand("Outake", new Outtake(wrist, claw, elevator));
+    NamedCommands.registerCommand("Intake", new Intake(claw, wrist));
+
+    NamedCommands.registerCommand("Intake", new SequentialCommandGroup(
+      new WristToPosition(wrist, WristPositions.TOGGLE_POSITION),
+      new MoveElevatorToPosition(elevator, wrist, ElevatorHeights.LOW_POSITION_L1),
+      new WristToPosition(wrist, WristPositions.LOW_WRIST_POSITION)
+      ));
+
+
+    NamedCommands.registerCommand("L2", new SequentialCommandGroup(
+      new WristToPosition(wrist, WristPositions.TOGGLE_POSITION),
+      new MoveElevatorToPosition(elevator, wrist, ElevatorHeights.LOW_MIDDLE_POSITION_L2), 
+      new WristToPosition(wrist, WristPositions.MIDDLE_WRIST_POSITION)
+        ));
+
+    NamedCommands.registerCommand("L3", new SequentialCommandGroup(
+      new WristToPosition(wrist, WristPositions.TOGGLE_POSITION),
+      new MoveElevatorToPosition(elevator, wrist, ElevatorHeights.HIGH_MIDDLE_POSITION_L3),  
+      new WristToPosition(wrist, WristPositions.L3_WRIST_POSITION)
+        ));
+
+    
+    NamedCommands.registerCommand("L4", new SequentialCommandGroup(
+      new WristToPosition(wrist, WristPositions.TOGGLE_POSITION),
+      new MoveElevatorToPosition(elevator, wrist, ElevatorHeights.HIGH_POSITION_L4),
+      new WristToPosition(wrist, WristPositions.HIGH_WRIST_POSITION) 
+    ));
 
     // Commands 
     wristWithJoy = new WristWithJoystick(operator, wrist);
     moveElevatorWithJoystick = new MoveElevatorWithJoystick(elevator,wrist, operator);
+    rotate90 = new RotateToAngle(180, swerve);
 
     reverseCoralIntake = Commands.startEnd(() -> {claw.spin(.1);}, () -> {claw.spin(0);}, claw);
     
@@ -165,7 +238,9 @@ public class RobotContainer {
     resetElevator = Commands.runOnce(() -> {elevator.resetElevator();});
 
     intake = new Intake(claw, wrist);
-    outtake = new Outtake(wrist, claw);
+    outtake = new Outtake(wrist, claw, elevator);
+
+    climbDown = new ClimbDown(climber);
 
     toggleAlgaeMode = new SequentialCommandGroup(Commands.runOnce(() -> {wrist.setAlgaeMode();}, wrist), new WristToPosition(wrist, WristPositions.TOGGLE_POSITION));
     toggleCoralMode = new SequentialCommandGroup(Commands.runOnce(() -> {wrist.setCoralMode();}, wrist), new WristToPosition(wrist, WristPositions.TOGGLE_POSITION));
@@ -175,8 +250,8 @@ public class RobotContainer {
       }, swerve);
 
     slowModeToggle = Commands.runOnce(() -> {swerve.toggleSlowMode();}, swerve);
-    
-    limeLightReset = Commands.runOnce(() -> {swerve.resetPoseLimelight();}, swerve);
+  
+    limeLightReset = new CamCheck(swerve);
  
     // Creating sequential command groups that use wrist and elevator
     goToIntake = new SequentialCommandGroup(
@@ -209,6 +284,16 @@ public class RobotContainer {
       new WristToPosition(wrist, WristPositions.ALGAE_WRIST_POSITION)
     );
 
+    //bring climb up and funnel up simultaneously
+    climbUp = new ParallelCommandGroup(
+      new ClimbUp(climber).withTimeout(5),
+      Commands.run(() -> {
+        if(climber.getClimbMode())
+            climber.funnelUp();
+        else
+            climber.funnelDown();
+      }, climber).withTimeout(3)
+    );
     // Button Assigments 
     level1Button = new JoystickButton(operator, XboxController.Button.kA.value );
     level2Button = new JoystickButton(operator, XboxController.Button.kB.value);
@@ -221,6 +306,17 @@ public class RobotContainer {
     toggleAlgaeModeButton = new POVButton(operator, 0);
     toggleCoralModeButton = new POVButton(operator, 180);
 
+    // Configure the trigger bindings
+    
+    toggleClimbButton = new JoystickButton(driver, XboxController.Button.kX.value);
+    climbButton = new JoystickButton(driver, XboxController.Button.kB.value);
+    
+    //wrist.setDefaultCommand(wristToAlgae);
+    elevator.setDefaultCommand(moveElevatorWithJoystick);
+
+    // Configure the trigger bindings
+
+
     resetEncoderButton = new POVButton(operator, 270);
     resetElevatorButton = new POVButton(operator, 90);
 
@@ -228,9 +324,11 @@ public class RobotContainer {
     slowModeButton = new JoystickButton(driver, XboxController.Button.kX.value);
     driveWithJoystick = new DriveWithJoystick(swerve, driver);
 
-    driveAssistButton = new JoystickButton(driver, XboxController.Button.kB.value);
+    rotate90Button = new JoystickButton(driver, XboxController.Button.kB.value);
     wristOverrideButton = new JoystickButton(operator, XboxController.Button.kStart.value);
     elevatorOverrideButton = new JoystickButton(operator, XboxController.Button.kBack.value);
+
+    camCheckButton = new JoystickButton(driver, XboxController.Button.kX.value);
 
     slowOuttakeButton = new JoystickButton(operator, XboxController.Button.kRightStick.value);
     reverseCoralButton = new JoystickButton(operator, XboxController.Button.kLeftStick.value);
@@ -252,17 +350,15 @@ public class RobotContainer {
     autoChooser.addOption("Single and Load", Autos.singleLoad(swerve, elevator, wrist, claw));
     autoChooser.addOption("Two piece Right", Autos.rightTwoPiece(swerve, elevator, wrist, claw));
 
-
-    //autoChooser.addOption("Test PATHPLANNER", new PathPlannerAuto("Test Auto"));
-
+    autoChooser.addOption("PathPlanner test", new PathPlannerAuto("Test Auto"));
+    
     // Smartdashboard Data 
     SmartDashboard.putData(wrist);
     SmartDashboard.putData(swerve);
     SmartDashboard.putData(claw);
     SmartDashboard.putData(autoChooser);
-    SmartDashboard.putData(elevator);
+    SmartDashboard.putData(climber);
     
-    // Defualt Commands
     wrist.setDefaultCommand(wristWithJoy);
     elevator.setDefaultCommand(moveElevatorWithJoystick);
     swerve.setDefaultCommand(driveWithJoystick);
@@ -272,7 +368,6 @@ public class RobotContainer {
     camera.setFPS(30);
 
     configureBindings();
-
   }
 
   /**
@@ -294,18 +389,26 @@ public class RobotContainer {
     toggleAlgaeModeButton.onTrue(toggleAlgaeMode);
     toggleCoralModeButton.onTrue(toggleCoralMode);
 
-    driveAssistButton.whileTrue(Commands.startEnd(()->{swerve.driveAssistOn();},()->{swerve.driveAssistOff();}));
+   // driveAssistButton.whileTrue(Commands.startEnd(()->{swerve.driveAssistOn();},()->{swerve.driveAssistOff();}));
 
     resetEncoderButton.onTrue(resetEncoder);
     resetElevatorButton.onTrue(resetElevator);
 
-
     // Moves the wrist to a certain position based on what button is pressed
-    level1Button.onTrue(goToIntake); 
-    level2Button.onTrue(goToL2);
-    level3Button.onTrue(goToL3);
-    level4Button.onTrue(goToL4);
-
+    level1Button.onTrue(goToIntake); //Right button on d-pad
+    level2Button.onTrue(goToL2); //Left button on d-pad
+    level3Button.onTrue(goToL3); //B button
+    level4Button.onTrue(goToL4); //Top button on d-pad
+    
+    //Toggles climb mode
+    toggleClimbButton.onTrue(Commands.runOnce(() -> {climber.toggleClimbMode();}, climber)); // X button
+    //runs climber
+    //press = bring up
+    //hold = bring down
+    climbButton.onTrue(climbUp.withTimeout(5)); // B button
+    climbButton.whileTrue(climbDown);
+    //climbButton.whileTrue(climb); // B button
+//hi 342
     // claw
     intakeButton.whileTrue(intake);
     outtakeButton.whileTrue(outtake);
@@ -314,6 +417,8 @@ public class RobotContainer {
 
     elevatorOverrideButton.onTrue(moveElevatorWithJoystick);
     wristOverrideButton.onTrue(wristWithJoy);
+
+    rotate90Button.onTrue(rotate90);
 
     limeLighButton.whileTrue(limeLightReset);
 

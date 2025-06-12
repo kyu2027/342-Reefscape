@@ -23,6 +23,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Claw extends SubsystemBase {
   /** Creates a new Claw. */
+
+    private Elevator elevator;
   
     private TalonFX claw;
     private DigitalInput forwardSensor;
@@ -45,8 +47,13 @@ public class Claw extends SubsystemBase {
   }
 
   public void outTakeAlgae(){
-    claw.set(-.5);
+      claw.set(-.5);
+      System.out.println("hello algae outake");
   }
+
+  public void outTakeAlgaeFast(){
+    claw.set(-.95);
+}
 
   public void stopButton(){
     claw.set(0);

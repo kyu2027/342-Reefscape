@@ -11,7 +11,7 @@ import frc.robot.LimelightHelpers;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.Vision.Limelight;
 
-public class AutoAlign extends Command {
+public class AlignRightCoral extends Command {
   /** Creates a new AutoAlign :3<< */
   private Limelight limelight;
   private SwerveDrive swerve;
@@ -19,7 +19,7 @@ public class AutoAlign extends Command {
   public double tx;
   private PIDController visionPID;
 
-  public AutoAlign(Limelight limelight, SwerveDrive swerve) {
+  public AlignRightCoral(Limelight limelight, SwerveDrive swerve) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.limelight = limelight;
     this.swerve = swerve;
@@ -37,24 +37,13 @@ public class AutoAlign extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    System.out.println("auto is aligning!!! :3");
-      
-      // gets angle away from tag then calculates how much to turn
-      tx = LimelightHelpers.getTX("");
-      System.out.println(tx);
-      double rSpeed = -visionPID.calculate(tx, 0);
-  
-      // puts rotate speed into ChassisSpeeds
-      chassisSpeeds = new ChassisSpeeds(0, 0, rSpeed);
-
-      //passes thru chassisSpeeds
-      swerve.drive(chassisSpeeds);
+    System.out.println("test? :3<<");
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    swerve.stopModules();
+
   }
 
   // Returns true when the command should end.
