@@ -13,8 +13,6 @@ import javax.print.attribute.standard.MediaSize.NA;
 
 import org.json.simple.parser.ParseException;
 
-import com.ctre.phoenix.sensors.PigeonIMU;
-import com.ctre.phoenix.sensors.WPI_PigeonIMU;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.fasterxml.jackson.core.filter.FilteringGeneratorDelegate;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -47,7 +45,6 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
 public class SwerveDrive extends SubsystemBase {
 
@@ -55,8 +52,7 @@ public class SwerveDrive extends SubsystemBase {
   public SwerveDriveOdometry odometry;
   private AHRS NavX;
 
-  private PigeonIMU pigeon;
-  private WPI_PigeonIMU piegon2;
+  private Pigeon2 pigeon2;
 
   private ChassisSpeeds chassisSpeeds;
   
@@ -153,7 +149,7 @@ public class SwerveDrive extends SubsystemBase {
         /* Initalize NavX (Gyro) */
         NavX = new AHRS(AHRS.NavXComType.kUSB1);
 
-        piegon2 = new WPI_PigeonIMU(16);
+        pigeon2 = new Pigeon2(16);
   
         /* Initalizes Odometry */
         odometry = new SwerveDriveOdometry( 
@@ -190,7 +186,7 @@ public class SwerveDrive extends SubsystemBase {
           new Thread(() -> {
             try {
               Thread.sleep(1000);
-              piegon2.setYaw(0); //NAVX WAS HERE
+              pigeon2.setYaw(0); //NAVX WAS HERE
             } catch (Exception e) {}
           }).start();
   
@@ -325,16 +321,16 @@ public class SwerveDrive extends SubsystemBase {
       return NavX;
     }
 
-    public WPI_PigeonIMU getPiegon(){
-      return piegon2;
+    public Pigeon2 getPiegon(){
+      return pigeon2;
     }
 
     public double gyroRad(){
-      return piegon2.getYaw() * Math.PI/180;
+      return pigeon2.getYaw().getValueAsDouble() * Math.PI/180;
     }
 
     public void resetGyro(){
-      piegon2.setYaw(0);
+      pigeon2.setYaw(0);
     }
 
     public void resetPose(Pose2d pose){
@@ -429,7 +425,7 @@ public class SwerveDrive extends SubsystemBase {
     sendableBuilder.addBooleanProperty("Slow Mode", ()-> slowMode, null);
 
     sendableBuilder.addDoubleProperty("Gyro Reading", ()-> gyroRad(), null); //NAVX USED TO BE HERE
-    sendableBuilder.addDoubleProperty("Raw Gyro Reading", ()-> piegon2.getYaw(), null); //NAVX USED TO BE HERE
+    sendableBuilder.addDoubleProperty("Raw Gyro Reading", ()-> pigeon2.getYaw().getValueAsDouble(), null); //NAVX USED TO BE HERE
 
     sendableBuilder.addDoubleProperty("FL Distance Travelled", ()-> frontLeftModule.getDistance(), null);
     sendableBuilder.addDoubleProperty("FL Velocity", ()-> frontLeftModule.getDriveVelocity(), null);
