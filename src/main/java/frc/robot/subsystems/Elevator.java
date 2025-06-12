@@ -142,6 +142,7 @@ public class Elevator extends SubsystemBase {
     return elevatorRightMotor.getBusVoltage() * elevatorRightMotor.getAppliedOutput();
   }
 
+  //Returns the velocity of the elevator in RPM
   public double getElevatorVelocity() {
     return elevatorEncoder.getVelocity();
   }

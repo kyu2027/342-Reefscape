@@ -125,7 +125,7 @@ public final class Constants {
     public static final int ELEVATORRIGHT_ID = 10;
 
     public static final double ELEVATOR_MAX_VELOCITY = 75; //In rotations
-    public static final double ELEVATOR_MAX_ACCELERATION = 450; //In rotations
+    public static final double ELEVATOR_MAX_ACCELERATION = 450; //In rotations per second
 
     public static final Constraints ELEVATOR_CONSTRAINTS = new Constraints(ELEVATOR_MAX_VELOCITY, ELEVATOR_MAX_ACCELERATION);
 
