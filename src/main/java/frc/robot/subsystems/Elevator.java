@@ -3,36 +3,43 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot.subsystems;
-
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
 import static frc.robot.Constants.ElevatorConstants.*;
-import static frc.robot.Constants.WristConstants.THROUGHBORE_PORT;
+import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.units.Units.Second;
+import static edu.wpi.first.units.Units.Volts;
 
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.config.MAXMotionConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
-import com.revrobotics.spark.config.MAXMotionConfig.MAXMotionPositionMode;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.spark.SparkClosedLoopController;
 import edu.wpi.first.util.sendable.SendableBuilder;
-import au.grapplerobotics.LaserCan;
-import au.grapplerobotics.interfaces.LaserCanInterface.Measurement;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.ElevatorFeedforward;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 
 public class Elevator extends SubsystemBase {
 
-  private SparkClosedLoopController elevatorPID;
+  private ProfiledPIDController elevatorPID;
+  private ElevatorFeedforward elevatorFF;
 
   private boolean goingDown;
   private boolean tooLow;
   private boolean tooHigh;
-  private boolean atPosition;
 
-  private double currentPosition;
+  private double pidOutput;
+  private double ffOutput;
+  private double voltInput;
+  private double goal;
 
   private SparkMax elevatorLeftMotor;
   private SparkMax elevatorRightMotor;
@@ -41,30 +48,19 @@ public class Elevator extends SubsystemBase {
 
   private SparkMaxConfig elevatorLeftMotorConfig;
   private SparkMaxConfig elevatorRightMotorConfig;
-  //private MAXMotionConfig elevatorPIDConfig;
 
-  private LaserCan elevatorLaserCan;
+  private final SysIdRoutine elevatorSysIDRoutine;
 
   /** Creates a new Elevator. */
   public Elevator() {
 
     goingDown = false;
-    atPosition = false;
 
     elevatorLeftMotor = new SparkMax(ELEVATORLEFT_ID, MotorType.kBrushless);
     elevatorRightMotor = new SparkMax(ELEVATORRIGHT_ID, MotorType.kBrushless);
 
-    elevatorPID = elevatorRightMotor.getClosedLoopController();
-
-    //elevatorPIDConfig = new MAXMotionConfig();
-
-    /*
-     * Configure the LaserCAN using the GrappleHook app as some of the code throws a 
-     * ConfigurationFailedException error. Short ranging mode is ideal due to less 
-     * interference from ambient light, but it only goes up to 1.3 meters while Long 
-     * ranging mode goes up to 4 meters.
-     */
-    elevatorLaserCan = new LaserCan(LASERCAN_ID);
+    elevatorPID = new ProfiledPIDController(ELEVATOR_P, ELEVATOR_I, ELEVATOR_D, ELEVATOR_CONSTRAINTS);
+    elevatorFF = new ElevatorFeedforward(ELEVATOR_KS, ELEVATOR_KG, ELEVATOR_KV, ELEVATOR_KA);
 
     elevatorLeftMotorConfig = new SparkMaxConfig();
 
@@ -89,41 +85,65 @@ public class Elevator extends SubsystemBase {
       .smartCurrentLimit(60);
   
     elevatorEncoder = elevatorRightMotor.getEncoder();
-
-    //PID values are still being tuned, but these values do work
-    elevatorRightMotorConfig.closedLoop
-      .pid(0.005, 0, 0.0015)
-      .outputRange(-.5, 1);
-    // elevatorRightMotorConfig.closedLoop.maxMotion.maxAcceleration(2);
-    // elevatorRightMotorConfig.closedLoop.maxMotion.maxVelocity(10);
-    // elevatorRightMotorConfig.closedLoop.maxMotion.allowedClosedLoopError(10);
     
-    elevatorRightMotorConfig.encoder
-      .positionConversionFactor(ELEVATOR_CONVERSION_FACTOR);
+    // elevatorRightMotorConfig.encoder
+    //   .positionConversionFactor(ELEVATOR_POSITION_CONVERSION_FACTOR)
+    //   .velocityConversionFactor(ELEVATOR_VELOCITY_CONVERSION_FACTOR);
       
 
     elevatorRightMotor.configure(elevatorRightMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
 
     elevatorEncoder.setPosition(0);
-    currentPosition = elevatorEncoder.getPosition();
+
+    elevatorSysIDRoutine = new SysIdRoutine(
+      new SysIdRoutine.Config(
+        Volts.of(1).per(Second),
+        Volts.of(4),
+        Seconds.of(10)
+      ),
+      new SysIdRoutine.Mechanism(
+        (volts) -> elevatorRightMotor.setVoltage(volts.in(Volts)), null, this)  
+    );
 
   }
 
-  //Returns the reading of the laserCAN in millimeters
-  public int getLaserCanReading() {
-    Measurement measurement = elevatorLaserCan.getMeasurement();
-    if(measurement != null) {
-      return measurement.distance_mm;
+  //Sets the goal of the elevator
+  public void setSetpoint(double setpoint) {
+
+    if(goal > TOP_POSITION) {
+      this.goal = TOP_POSITION;
+    }else if(goal < BOTTOM_POSITION) {
+      this.goal = BOTTOM_POSITION;
     }else{
-      return 0;
+      this.goal = setpoint;
     }
-    //return elevatorLaserCan.getMeasurement().distance_mm;
+
+    elevatorPID.setGoal(goal);
   }
 
   //Returns the reading of the relative encoder
   public double getEncoderPosition() {
     return elevatorEncoder.getPosition();
+  }
+
+  //Returns the velocity the elevator wants to reach
+  public double getGoalVelocity() {
+    return elevatorPID.getSetpoint().velocity;
+  }
+
+  //Returns the position the elevator wants to reach
+  public double getGoalPosition() {
+    return elevatorPID.getSetpoint().position;
+  }
+
+  //Returns the voltage the motors are running at
+  public double getElevatorVoltage() {
+    return elevatorRightMotor.getBusVoltage() * elevatorRightMotor.getAppliedOutput();
+  }
+
+  public double getElevatorVelocity() {
+    return elevatorEncoder.getVelocity();
   }
 
   /*
@@ -136,30 +156,31 @@ public class Elevator extends SubsystemBase {
   // }
 
   //Moves the elevator to the given position
-  public void ElevatorToPosition(double nextPosition) {
-    atPosition = false;
+  public void ElevatorToPosition() {
 
-    goingDown = currentPosition > nextPosition;
+    goingDown = getEncoderPosition() > goal;
     tooLow = elevatorEncoder.getPosition() < BOTTOM_POSITION;
     tooHigh = elevatorEncoder.getPosition() > TOP_POSITION;
 
     if(goingDown && tooLow || !goingDown && tooHigh)
       stop();
-    else {
-      elevatorPID.setReference(nextPosition, ControlType.kPosition);
-      currentPosition = nextPosition;
+    else{
+      elevatorPID.setGoal(goal);
+
+      pidOutput = elevatorPID.calculate(getEncoderPosition());
+      ffOutput = elevatorFF.calculate(elevatorPID.getSetpoint().velocity);
+      voltInput = MathUtil.clamp(pidOutput + ffOutput, -12, 12);
+
+      elevatorRightMotor.setVoltage(voltInput);
     }
 
-    isAtPosition(nextPosition);
   }
 
   //This method will set the elevator motors to the inputted value
   public void moveElevator(double speed) {
-    if(Math.abs(speed) > 0.05) {
-      elevatorRightMotor.set(speed);
-      currentPosition = getEncoderPosition();
-    }else{
-      holdPosition();
+    if(Math.abs(speed) > 0.15) {
+      goal += speed * 10;
+      setSetpoint(goal);
     }
   }
 
@@ -168,30 +189,54 @@ public class Elevator extends SubsystemBase {
     elevatorRightMotor.stopMotor();
   }
 
-  //Sets the encoder position to the laserCAN position
-  public void resetEncoder() {
-    elevatorEncoder.setPosition((double) (getLaserCanReading()));
-  }
-
   //Holds the current position
-  public void holdPosition() {
-    elevatorPID.setReference(currentPosition, ControlType.kPosition);
+  public void holdPosition(double position) {
+    pidOutput = MathUtil.clamp(elevatorPID.calculate(getEncoderPosition(), position), -1, 1);
+    elevatorRightMotor.set(pidOutput);
   }
 
-  public void isAtPosition(double nextPosition) {
-    atPosition = Math.abs(getEncoderPosition() - nextPosition) < ELEVATOR_ERROR;
-  }
-
+  //Resets elevator to starting position
   public void resetElevator(){
-    elevatorEncoder.setPosition(0);
+    this.goal = 0;
+    elevatorEncoder.setPosition(goal);
+    setSetpoint(goal);
+  }
+
+  //Checks if the elevator is at the correct position
+  public boolean atPosition(double position) {
+    return Math.abs(position - getEncoderPosition()) < ELEVATOR_ERROR;
+  }
+
+  //Runs the system identification routine
+  public Command runSysID() {
+    return Commands.sequence(
+      elevatorSysIDRoutine
+        .quasistatic(Direction.kForward)
+        .until(() -> atPosition(L4_HEIGHT)),
+      elevatorSysIDRoutine
+        .quasistatic(Direction.kReverse)
+        .until(() -> atPosition(L2_HEIGHT)),
+      elevatorSysIDRoutine
+        .dynamic(Direction.kForward)
+        .until(() -> atPosition(L4_HEIGHT)),
+      elevatorSysIDRoutine
+        .dynamic(Direction.kReverse)
+        .until(() -> atPosition(L2_HEIGHT))
+    );
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    if(atPosition) {
-      holdPosition();
+    if(getEncoderPosition() <= 0.5 && goal == 0.0) {
+      elevatorFF.setKg(0);
+    }else{
+      if(elevatorFF.getKg() == 0) {
+        elevatorFF.setKg(ELEVATOR_KG);
+      }
     }
+
+    ElevatorToPosition();
   }
 
   @Override
@@ -201,9 +246,11 @@ public class Elevator extends SubsystemBase {
     builder.setSmartDashboardType("Elevator");
 
     //Data being put on Elastic for debugging purposes
-    builder.addDoubleProperty("LaserCAN Reading", () -> getLaserCanReading(), null);
-    builder.addDoubleProperty("Relative Encoder Reading", () -> getEncoderPosition(), null);
-    builder.addDoubleProperty("Elevator Error", () -> ((double) (getLaserCanReading())) - getEncoderPosition(), null);
+    builder.addDoubleProperty("Elevator Position", () -> getEncoderPosition(), null);
+    builder.addDoubleProperty("Goal Velocity", () -> getGoalVelocity(), null);
+    builder.addDoubleProperty("Goal Position", () -> getGoalPosition(), null);
+    builder.addDoubleProperty("Elevator Voltage", () -> getElevatorVoltage(), null);
+    builder.addDoubleProperty("Elevator Velocity", () -> getElevatorVelocity(), null);
   }
 
 }

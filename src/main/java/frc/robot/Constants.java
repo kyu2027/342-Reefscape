@@ -16,6 +16,7 @@ import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -122,13 +123,26 @@ public final class Constants {
 
     public static final int ELEVATORLEFT_ID = 9;
     public static final int ELEVATORRIGHT_ID = 10;
-    public static final int LASERCAN_ID = 0;
 
-    public static final double ELEVATOR_CONVERSION_FACTOR = (139.7 * 2) / 9; /**(2.0/3.0) * 25.4 * 2;*/
+    public static final double ELEVATOR_MAX_VELOCITY = 75; //In rotations
+    public static final double ELEVATOR_MAX_ACCELERATION = 450; //In rotations
+
+    public static final Constraints ELEVATOR_CONSTRAINTS = new Constraints(ELEVATOR_MAX_VELOCITY, ELEVATOR_MAX_ACCELERATION);
+
+    public static final double ELEVATOR_P = 1;
+    public static final double ELEVATOR_I = 0.0;
+    public static final double ELEVATOR_D = 0.01;
+    public static final double ELEVATOR_KS = 0.20137;
+    public static final double ELEVATOR_KG = 0.56541;
+    public static final double ELEVATOR_KV = 0.001756;
+    public static final double ELEVATOR_KA = 0.00043344;
+
+    //public static final double ELEVATOR_POSITION_CONVERSION_FACTOR = (139.7 * 2) / 9; //Converts the encoder to millimeters
+    //public static final double ELEVATOR_VELOCITY_CONVERSION_FACTOR = ELEVATOR_POSITION_CONVERSION_FACTOR / 60;
 
     public static final double BOTTOM_POSITION = 0.0;
-    public static final double TOP_POSITION = 1500.0;
-    public static final double ELEVATOR_ERROR = 10.0;
+    public static final double TOP_POSITION = 48.3178246001; /**1500*/
+    public static final double ELEVATOR_ERROR = 0.25;
 
     /*
      * Still tuning values for positions because
@@ -137,13 +151,13 @@ public final class Constants {
      * the numbers on the right is what the laserCAN reads.
      */
     public static final double L1_HEIGHT = 0.0;
-    public static final double L2_HEIGHT = 241.7 /**300.0*/;
-    public static final double L3_HEIGHT = 644.58 /**485.0*/;
-    public static final double L4_HEIGHT = 1384.0 /**850.0*/;
-    public static final double PROCESSOR_HEIGHT = 36.0;
+    public static final double L2_HEIGHT = 7.79527570215 /**242*/;
+    public static final double L3_HEIGHT = 20.7766643103 /**645*/;
+    public static final double L4_HEIGHT = 44.5812461644 /**1384*/;
+    public static final double PROCESSOR_HEIGHT = 1.15962777546; /**36*/
 
-    public static final double ALGAE_LOW_HEIGHT = 462.36;
-    public static final double ALGAE_HIGH_HEIGHT = 884.672;
+    public static final double ALGAE_LOW_HEIGHT = 14.8818899768; /**462*/
+    public static final double ALGAE_HIGH_HEIGHT = 27.5075201872; /**885*/
 
   }
 

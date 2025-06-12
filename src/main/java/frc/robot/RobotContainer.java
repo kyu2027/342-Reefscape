@@ -235,7 +235,7 @@ public class RobotContainer {
     slowOuttake = Commands.startEnd(() -> {claw.slowOutakeCoral();}, () -> {claw.spin(0);}, claw);
 
     resetEncoder = Commands.runOnce(() -> {wrist.resetEncoder();});
-    resetElevator = Commands.runOnce(() -> {elevator.resetEncoder();});
+    resetElevator = Commands.runOnce(() -> {elevator.resetElevator();});
 
     intake = new Intake(claw, wrist);
     outtake = new Outtake(wrist, claw, elevator);
@@ -339,6 +339,7 @@ public class RobotContainer {
     autoChooser = new SendableChooser<>();
     //autoChooser.addOption("PathPlannerTest", new PathPlannerAuto("New Auto"));
 
+    autoChooser.addOption("System Identification", Autos.SysID(elevator, wrist));
     autoChooser.addOption("Do Nothing", Autos.doNothing(swerve));
 
     autoChooser.addOption("Pose Drive", Autos.move(swerve));

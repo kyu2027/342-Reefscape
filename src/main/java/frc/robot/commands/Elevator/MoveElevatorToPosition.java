@@ -10,10 +10,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Wrist;
 import frc.robot.Constants.ElevatorConstants;
-import frc.robot.Constants.*;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.XboxController;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class MoveElevatorToPosition extends Command {
@@ -50,7 +46,7 @@ public class MoveElevatorToPosition extends Command {
   @Override
   public void execute() {
     if(wrist.isSafe())
-      elevator.ElevatorToPosition(nextPosition);
+      elevator.setSetpoint(nextPosition);
   }
 
   // Called once the command ends or is interrupted.
@@ -60,6 +56,6 @@ public class MoveElevatorToPosition extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return Math.abs(elevator.getEncoderPosition() - nextPosition) < ELEVATOR_ERROR;
+    return Math.abs(nextPosition - elevator.getEncoderPosition()) < ELEVATOR_ERROR;
   }
 }
