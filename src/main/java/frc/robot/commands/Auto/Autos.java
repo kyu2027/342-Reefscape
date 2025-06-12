@@ -22,6 +22,7 @@ import frc.robot.subsystems.Wrist;
 import frc.robot.subsystems.Vision.Limelight;
 
 import static frc.robot.Constants.ElevatorConstants.L4_HEIGHT;
+import static frc.robot.Constants.WristConstants.ALGAE_POSITION;
 
 import org.opencv.core.Mat;
 
@@ -43,6 +44,13 @@ public final class Autos {
   
   public static Command doNothing(SwerveDrive swerve){
     return Commands.sequence(new TimedDrive(swerve, 0, 0, 0, 0));
+  }
+
+  public static Command SysID(Elevator elevator, Wrist wrist) {
+    return Commands.sequence(
+      new WristToPosition(wrist, WristPositions.ALGAE_WRIST_POSITION),
+      elevator.runSysID()
+    );
   }
 
    public static Command move(SwerveDrive swerve){

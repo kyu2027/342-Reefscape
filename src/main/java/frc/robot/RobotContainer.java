@@ -241,6 +241,7 @@ public class RobotContainer {
     autoChooser = new SendableChooser<>();
     //autoChooser.addOption("PathPlannerTest", new PathPlannerAuto("New Auto"));
 
+    autoChooser.addOption("System Identification", Autos.SysID(elevator, wrist));
     autoChooser.addOption("Do Nothing", Autos.doNothing(swerve));
 
     autoChooser.addOption("Pose Drive", Autos.move(swerve));
@@ -250,6 +251,7 @@ public class RobotContainer {
     autoChooser.addOption("Two Piece Sketch", Autos.twoPieceMiddle(swerve, elevator, wrist, claw));
     autoChooser.addOption("Single and Load", Autos.singleLoad(swerve, elevator, wrist, claw));
     autoChooser.addOption("Two piece Right", Autos.rightTwoPiece(swerve, elevator, wrist, claw));
+
 
     //autoChooser.addOption("Test PATHPLANNER", new PathPlannerAuto("Test Auto"));
 
